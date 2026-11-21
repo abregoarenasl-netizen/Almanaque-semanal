@@ -15,7 +15,7 @@
     <!-- Google Fonts: Playfair Display (Editorial Art Nouveau) & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         /* =====================================================================
@@ -117,6 +117,16 @@
         .font-nouveau {
             font-family: 'Playfair Display', Georgia, serif;
         }
+        .font-display { font-family: 'Cinzel Decorative', 'Playfair Display', Georgia, serif; letter-spacing: .035em; }
+        .day-filter-track { background:linear-gradient(135deg, color-mix(in srgb, var(--card-bg) 92%, transparent), color-mix(in srgb, var(--bg-paper-deep) 88%, transparent)); border:1px solid color-mix(in srgb, var(--border-ornament) 55%, transparent); border-radius:999px; padding:5px; box-shadow:inset 0 1px 8px rgba(0,0,0,.32), 0 5px 16px rgba(0,0,0,.18); }
+        .day-filter-btn { min-width:36px; border-radius:999px; padding:7px 11px; font-size:11px; font-weight:800; border:1px solid transparent; transition:transform .22s ease, background .22s ease, box-shadow .22s ease; }
+        .day-filter-btn:active { transform:scale(.93); }
+        .activity-category-card { min-height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border:1px solid color-mix(in srgb, var(--border-ornament) 42%, transparent); border-radius:14px; padding:10px 6px; transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+        .activity-category-card .category-emoji { font-size:25px; line-height:1; filter:drop-shadow(0 2px 5px rgba(0,0,0,.25)); }
+        .activity-category-card.selected { transform:translateY(-2px); box-shadow:0 0 0 1px var(--accent-gold), 0 7px 18px rgba(0,0,0,.25), 0 0 18px var(--aura-glow); }
+        .activity-modal-panel { background:radial-gradient(circle at 90% 0%, var(--aura-glow), transparent 42%), var(--card-bg); box-shadow:0 24px 80px rgba(0,0,0,.6), inset 0 0 0 1px color-mix(in srgb, var(--accent-gold) 22%, transparent); }
+        .day-open-animation { animation:dayReveal .48s cubic-bezier(.16,1,.3,1) both; transform-origin:top center; will-change:opacity,transform; }
+        @keyframes dayReveal { 0% { opacity:0; transform:translate3d(0,22px,0) scale(.985); } 65% { opacity:1; transform:translate3d(0,-2px,0) scale(1.002); } 100% { opacity:1; transform:translate3d(0,0,0) scale(1); } }
 
         /* Marco Editorial Art Nouveau Nocturno con doble filete dorado y resplandor sutil */
         .nouveau-frame {
@@ -245,10 +255,9 @@
         }
         .habit-particle { position:fixed; width:6px; height:6px; border-radius:50%; z-index:120; pointer-events:none; box-shadow:0 0 8px currentColor; animation:habitBurst .85s ease-out forwards; }
         @keyframes habitBurst { 0% { opacity:1; transform:translate(-50%,-50%) scale(.5) rotate(0deg); } 100% { opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.7) rotate(180deg); } }
-        .light-particle { position:fixed; width:3px; height:3px; border-radius:50%; z-index:125; pointer-events:none; box-shadow:0 0 7px 2px currentColor; animation:lightBurst .8s ease-out forwards; }
+        .light-particle { position:fixed; width:3px; height:3px; border-radius:50%; z-index:125; pointer-events:none; box-shadow:0 0 7px 2px currentColor; animation:lightBurst .72s cubic-bezier(.16,1,.3,1) forwards; will-change:transform,opacity; }
         @keyframes lightBurst { 0% { opacity:0; transform:translate(-50%,-50%) scale(.3); } 15% { opacity:1; } 100% { opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.25); } }
-        .day-open-animation { animation:dayReveal .58s cubic-bezier(.2,.8,.2,1) both; transform-origin:top center; }
-        @keyframes dayReveal { 0% { opacity:0; transform:perspective(900px) rotateX(-13deg) scaleY(.88); clip-path:inset(0 0 70% 0 round 18px); } 100% { opacity:1; transform:perspective(900px) rotateX(0) scaleY(1); clip-path:inset(0 0 0 0 round 18px); } }
+
         @media (prefers-reduced-motion:reduce) { .day-open-animation,.light-particle { animation:none !important; } }
     </style>
 </head>
@@ -294,22 +303,32 @@
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 px-2 sm:px-4">
                 <!-- Encabezado editorial del organizador -->
                 <div class="space-y-2 flex-1 py-1">
-                    <div class="font-nouveau text-4xl sm:text-5xl lg:text-6xl font-bold tracking-wide leading-tight" style="color:var(--accent-gold); text-shadow:0 2px 18px var(--aura-glow);">
+                    <div class="font-display text-3xl sm:text-4xl lg:text-5xl font-black tracking-wide leading-tight" style="color:var(--accent-gold); text-shadow:0 2px 18px var(--aura-glow);">
                         Organizador semanal
                     </div>
-                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                        <span class="font-nouveau italic text-xl sm:text-2xl" style="color:var(--secondary);">La semana</span>
-                        <span id="weekDatesLabel" class="font-nouveau text-base sm:text-lg tracking-wide" style="color:var(--ink-muted);">Cargando fechas...</span>
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-3">
+                        <span id="weekDatesLabel" class="font-nouveau text-lg sm:text-xl tracking-wide" style="color:var(--ink-muted);">Cargando fechas...</span>
                     </div>
                 </div>
 
-                <!-- Bloque Derecho: Selector Visual de Teoría del Color + Progreso -->
-                <div class="flex flex-col gap-3.5 xl:items-end">
+                <!-- Progreso protagonista y selector cromático secundario -->
+                <div class="flex flex-col gap-1.5 xl:items-end">
+                    <!-- Medidor General de Avance Semanal -->
+                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="px-4 py-3.5 rounded-2xl border w-full xl:w-[25rem] relative overflow-hidden shadow-xl">
+                        <div class="flex justify-between items-center text-sm font-bold mb-2">
+                            <span class="font-nouveau text-base sm:text-lg tracking-wide" style="color:var(--ink-dark);">✦ Progreso semanal</span>
+                            <span id="globalProgressText" style="color: var(--accent-gold);" class="font-extrabold">0% (0/0)</span>
+                        </div>
+                        <div style="background-color: var(--bg-paper-deep);" class="w-full h-3 rounded-full overflow-hidden border border-white/10 shadow-inner">
+                            <div id="globalProgressBar" style="width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent-gold));" class="h-full rounded-full transition-all duration-500"></div>
+                        </div>
+                    </div>
+
                     <!-- Selector con Diagrama de Círculo Cromático -->
-                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="p-3 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center gap-3.5">
+                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="p-2 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center gap-2 scale-[.96] origin-right">
                         <!-- Mini Diagrama SVG del Círculo Cromático -->
                         <div class="flex items-center gap-2.5">
-                            <svg id="colorWheelSvg" class="w-12 h-12 flex-shrink-0" viewBox="0 0 60 60">
+                            <svg id="colorWheelSvg" class="w-8 h-8 flex-shrink-0" viewBox="0 0 60 60">
                                 <!-- Anillo cromático sutil -->
                                 <circle cx="30" cy="30" r="24" fill="none" stroke="var(--border-ornament)" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
                                 <circle cx="30" cy="30" r="16" fill="none" stroke="var(--border-ornament)" stroke-width="0.8" opacity="0.35"/>
@@ -319,8 +338,8 @@
                                 <g id="wheelHarmonyNodes"></g>
                             </svg>
                             <div>
-                                <div class="text-[10px] font-bold uppercase tracking-wider opacity-70">Teoría del Color</div>
-                                <div id="harmonyDescription" class="font-nouveau text-xs font-bold">Complementarios (180°)</div>
+                                <div class="text-[9px] font-bold uppercase tracking-wider opacity-70">Teoría del Color</div>
+                                <div id="harmonyDescription" class="font-nouveau text-[11px] font-bold">Complementarios (180°)</div>
                             </div>
                         </div>
 
@@ -366,16 +385,6 @@
                         </div>
                     </div>
 
-                    <!-- Medidor General de Avance Semanal -->
-                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="px-3.5 py-2.5 rounded-xl border w-full xl:w-96">
-                        <div class="flex justify-between items-center text-xs font-bold mb-1.5">
-                            <span class="opacity-80">Progreso de la Semana</span>
-                            <span id="globalProgressText" style="color: var(--accent-gold);" class="font-extrabold">0% (0/0)</span>
-                        </div>
-                        <div style="background-color: var(--bg-paper-deep);" class="w-full h-2.5 rounded-full overflow-hidden border border-white/10">
-                            <div id="globalProgressBar" style="width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent-gold));" class="h-full rounded-full transition-all duration-500"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </header>
@@ -412,16 +421,16 @@
             </div>
 
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3 px-1">
-                <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda Horaria (06:30 — 23:00)</h2>
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-xs font-semibold opacity-75 mr-1">Ir a día:</span>
-                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="nouveau-btn px-2.5 py-1 text-xs">Todos (7)</button>
+                <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda horaria</h2>
+                <div class="day-filter-track flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs font-semibold opacity-75 mr-1 px-1">Ir a día</span>
+                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="day-filter-btn">Todos (7)</button>
                     <div id="dayQuickJumpButtons" class="flex flex-wrap gap-1"></div>
                 </div>
             </div>
 
             <!-- Vista semanal o día individual -->
-            <div id="weekDaysContainer" class="overflow-x-auto pb-3">
+            <div id="weekDaysContainer" class="days-panorama overflow-x-auto pb-3">
                 <div id="weekDaysGrid" class="flex flex-row gap-4 w-max">
                     <!-- Las 7 columnas con franjas de 06:30 a 23:00 -->
                 </div>
@@ -528,31 +537,31 @@
          MODAL RÁPIDO DE EDICIÓN DE HORARIO (PARA EDITAR O AGENDAR CON DETALLE)
     ================================================================== -->
     <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
-        <div class="nouveau-frame max-w-md w-full p-5 sm:p-6 relative">
+        <div class="nouveau-frame activity-modal-panel max-w-lg w-full p-5 sm:p-7 relative">
             <button onclick="closeScheduleModal()" style="border-color: var(--border-ornament);" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:bg-white/10 absolute top-4 right-4">
                 ✕
             </button>
-            <h3 id="modalTitle" class="font-nouveau text-2xl font-bold">Agendar Actividad</h3>
+            <div class="mb-5 pr-8"><div class="text-[10px] uppercase tracking-[.24em] font-extrabold mb-1" style="color:var(--accent-gold);">✦ Nueva entrada</div><h3 id="modalTitle" class="font-display text-2xl sm:text-3xl font-bold">Agendar actividad</h3></div>
             <p id="modalSubtitle" class="text-xs font-semibold opacity-75 mb-4">Día y franja horaria</p>
 
             <form onsubmit="submitScheduleModal(event)" class="space-y-4">
                 <input type="hidden" id="modalDayIndex" />
                 <input type="hidden" id="modalTaskId" />
 
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider mb-1">Horario</label>
                         <select id="modalHourSelect" style="background-color: var(--card-elevated); border-color: var(--border-ornament); color: var(--ink-dark);" class="w-full px-2.5 py-2 rounded-lg border text-sm font-bold">
                             <!-- Opciones 06:30 a 23:00 -->
                         </select>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1">Descripción</label>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1">¿Qué vas a hacer?</label>
                         <input
                             type="text"
                             id="modalTaskText"
                             required
-                            placeholder="Ej: Lectura de ensayo..."
+                            placeholder="Escribí tu actividad..."
                             style="background-color: var(--card-elevated); border-color: var(--border-ornament); color: var(--ink-dark);"
                             class="w-full px-3 py-2 rounded-lg border text-sm font-medium focus:bg-black/35 focus:outline-none"
                         />
@@ -561,7 +570,7 @@
 
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5">Categoría</label>
-                    <div id="modalCategorySelector" class="grid grid-cols-3 gap-2"></div>
+                    <div id="modalCategorySelector" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
                     <input type="hidden" id="modalCategoryValue" value="trabajo" />
                 </div>
 
@@ -570,7 +579,7 @@
                         Cancelar
                     </button>
                     <button type="submit" style="background-color: var(--primary); color: #FAF6EE;" class="nouveau-btn px-5 py-2 text-xs">
-                        Guardar en Agenda
+                        Guardar actividad ✦
                     </button>
                 </div>
             </form>
@@ -696,36 +705,16 @@
 
         function createDefaultWeekData() {
             return {
-                title: 'Grimorio Nocturno de Ritmo, Estudio & Creación',
-                // Incluye una prioridad larga (I), una media/larga (II) y una corta (III) sin scroll
+                title: '',
                 priorities: [
-                    {
-                        text: 'Concluir el cuaderno botánico nocturno revisando márgenes dorados, tipografía serif y armonías cromáticas antes del viernes',
-                        done: true
-                    },
-                    {
-                        text: 'Estudiar arquitectura y composición visual',
-                        done: false
-                    },
-                    {
-                        text: 'Paseo nocturno breve',
-                        done: false
-                    }
+                    { text: '', done: false },
+                    { text: '', done: false },
+                    { text: '', done: false }
                 ],
-                // La agenda comienza vacía en los siete días.
                 tasks: Array.from({ length: 7 }, () => []),
-                habits: [
-                    { id: 'h1', name: '🌿 Caminata matutina 30m', days: [true, true, true, false, false, false, false] },
-                    { id: 'h2', name: '📖 Lectura sin pantallas', days: [true, false, true, true, false, false, false] },
-                    { id: 'h3', name: '💧 Hidratación consciente', days: [true, true, true, true, false, false, false] },
-                    { id: 'h4', name: '🕯 Descanso antes de 23:00', days: [false, true, true, false, false, false, false] }
-                ],
+                habits: [],
                 checklist: [],
-                notes: [
-                    { id: 'n1', code: 'EX-01', text: 'Conseguir papel algodón de 200g y pluma estilográfica de punto fino.' },
-                    { id: 'n2', code: 'EX-02', text: 'Revisar paleta de pigmentos minerales para la portada del próximo mes.' },
-                    { id: 'n3', code: 'EX-03', text: 'Recordar confirmar la reserva del jueves a las 15:30.' }
-                ]
+                notes: []
             };
         }
 
@@ -743,19 +732,24 @@
             const mondayKey = getMondayISO(weekOffset);
             if (!appState.weeks[mondayKey]) appState.weeks[mondayKey] = createDefaultWeekData();
 
-            // Limpieza única de las actividades de demostración que estaban cargadas en las semanas anteriores.
+            // Reinicio solicitado: eliminar todo el contenido de ejemplo de TODAS las semanas.
             if (!appState.migrations) appState.migrations = {};
-            if (!appState.migrations.emptyDemoSchedulesV1) {
+            if (!appState.migrations.fullCleanSlateV2) {
                 Object.values(appState.weeks).forEach(w => {
+                    w.priorities = [{ text: '', done: false }, { text: '', done: false }, { text: '', done: false }];
                     w.tasks = Array.from({ length: 7 }, () => []);
+                    w.habits = [];
+                    w.notes = [];
+                    w.checklist = [];
                 });
-                appState.migrations.emptyDemoSchedulesV1 = true;
+                appState.migrations.fullCleanSlateV2 = true;
                 saveState(false);
             }
             Object.values(appState.weeks).forEach(w => {
                 if (!Array.isArray(w.checklist)) w.checklist = [];
                 if (!Array.isArray(w.notes)) w.notes = [];
                 if (!Array.isArray(w.tasks)) w.tasks = Array.from({ length: 7 }, () => []);
+                if (!Array.isArray(w.priorities)) w.priorities = [{text:'',done:false},{text:'',done:false},{text:'',done:false}];
             });
 
             if (!COLOR_THEORY_META[appState.theme]) {
@@ -825,6 +819,7 @@
 
         function changeWeek(delta) {
             weekOffset = delta === 0 ? 0 : weekOffset + delta;
+            if (delta === 0) focusedDayIndex = (new Date().getDay() + 6) % 7;
             inlineEditorState = null;
             animateFocusedDay = focusedDayIndex !== null;
             renderAll();
@@ -1008,11 +1003,13 @@
 
             const allBtn = document.getElementById('focus-btn-all');
             if (focusedDayIndex === null) {
-                allBtn.style.backgroundColor = 'var(--primary)';
+                allBtn.style.background = 'linear-gradient(135deg,var(--primary),var(--secondary))';
                 allBtn.style.color = '#FAF6EE';
+                allBtn.style.boxShadow = '0 0 14px var(--aura-glow)';
             } else {
-                allBtn.style.backgroundColor = 'var(--card-elevated)';
+                allBtn.style.background = 'var(--card-elevated)';
                 allBtn.style.color = 'var(--ink-dark)';
+                allBtn.style.boxShadow = 'none';
             }
 
             DAYS_CONFIG.forEach((d, idx) => {
@@ -1021,9 +1018,10 @@
                 btn.textContent = d.short;
                 btn.onclick = () => setFocusedDay(idx);
                 const isActive = focusedDayIndex === idx;
-                btn.style.backgroundColor = isActive ? 'var(--secondary)' : 'var(--card-elevated)';
+                btn.style.background = isActive ? 'linear-gradient(135deg,var(--secondary),var(--primary))' : 'var(--card-elevated)';
                 btn.style.color = isActive ? '#FAF6EE' : 'var(--ink-dark)';
-                btn.className = 'nouveau-btn px-2.5 py-1 text-xs';
+                btn.style.boxShadow = isActive ? '0 0 13px var(--aura-glow)' : 'none';
+                btn.className = 'day-filter-btn';
                 container.appendChild(btn);
             });
         }
@@ -1070,7 +1068,7 @@
 
                 const dayNum = getDayNumber(mondayISO, dayIdx);
                 const dayTasks = weekData.tasks[dayIdx] || [];
-                const completedCount = dayTasks.filter(t => t.done).length;
+                const completedCount = dayTasks.filter(t => t.status === 'done' || t.done).length;
                 const dayPct = dayTasks.length ? Math.round((completedCount / dayTasks.length) * 100) : 0;
 
                 // Agrupar tareas por franja horaria
@@ -1169,7 +1167,7 @@
                         // Franja libre clicable
                         html += `
                             <div
-                                onclick="openInlineEditor(${dayIdx}, '${slotHour}')"
+                                onclick="openScheduleModal(${dayIdx}, '${slotHour}')"
                                 style="${isTopOfHour ? 'background-color: rgba(255,255,255,0.025);' : ''}"
                                 class="group flex items-center justify-between px-2.5 py-1.5 cursor-pointer hover:bg-white/5 transition-colors"
                             >
@@ -1199,22 +1197,18 @@
                                         </span>
                                     </div>
                                     <div class="flex items-start gap-1.5">
-                                        <button
-                                            type="button"
-                                            onclick="toggleTaskCompletion(${dayIdx}, '${task.id}', this)"
-                                            style="border-color: ${cat.color}; background-color: ${task.done ? cat.color : 'var(--bg-paper-deep)'}; color: #FFFFFF;"
-                                            class="mt-0.5 w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center text-[10px] font-bold cursor-pointer"
-                                        >
-                                            ${task.done ? '✓' : ''}
-                                        </button>
-                                        <p class="text-xs font-semibold leading-snug break-words flex-1 ${task.done ? 'line-through opacity-65' : ''}">
+                                        <p class="text-xs font-semibold leading-snug break-words flex-1 ${task.status === 'done' || task.done ? 'line-through opacity-65' : ''}">
                                             ${escapeHtml(task.text)}
                                         </p>
+                                        <div class="flex items-center gap-1 flex-shrink-0">
+                                            <button type="button" onclick="setTaskStatus(${dayIdx}, '${task.id}', 'done', this)" title="Actividad cumplida" aria-label="Cumplida" style="border-color:#4CAF78;background:${task.status === 'done' || task.done ? '#237A4A' : 'transparent'};color:${task.status === 'done' || task.done ? '#fff' : '#4CAF78'}" class="w-7 h-7 rounded-lg border flex items-center justify-center text-sm font-black transition-all">✓</button>
+                                            <button type="button" onclick="setTaskStatus(${dayIdx}, '${task.id}', 'missed', this)" title="Actividad no cumplida" aria-label="No cumplida" style="border-color:#E16B6B;background:${task.status === 'missed' ? '#9F3038' : 'transparent'};color:${task.status === 'missed' ? '#fff' : '#E16B6B'}" class="w-7 h-7 rounded-lg border flex items-center justify-center text-sm font-black transition-all">✕</button>
+                                        </div>
                                     </div>
                                     <div class="flex items-center justify-end gap-1.5 mt-1.5 pt-1 border-t border-white/10">
                                         <button
                                             type="button"
-                                            onclick="openInlineEditor(${dayIdx}, '${slotHour}')"
+                                            onclick="openScheduleModal(${dayIdx}, '${slotHour}')"
                                             class="text-[10px] font-semibold opacity-65 hover:opacity-100"
                                             title="Añadir otra en este horario"
                                         >
@@ -1286,17 +1280,14 @@
             renderAll();
         }
 
-        function toggleTaskCompletion(dayIdx, taskId, button) {
+        function setTaskStatus(dayIdx, taskId, status, button) {
             const task = getActiveWeek().tasks[dayIdx].find(t => t.id === taskId);
             if (!task) return;
-            task.done = !task.done;
-            if (task.done) launchTinyLightParticles(button);
-            lastShimmeryTaskId = task.done ? task.id : null;
+            task.status = task.status === status ? 'pending' : status;
+            task.done = task.status === 'done';
+            if (task.status === 'done') launchTinyLightParticles(button);
             saveState(false);
-            renderAll();
-            if (task.done) {
-                triggerToast('Actividad completada ✦');
-            }
+            renderWeeklySchedule(getMondayISO(weekOffset), getActiveWeek());
         }
 
         function deleteTask(dayIdx, taskId) {
@@ -1310,6 +1301,7 @@
            MODAL DE EDICIÓN DE HORARIO / CATEGORÍA
         ===================================================================== */
         function openScheduleModal(dayIdx, defaultHour = '09:00', taskId = '') {
+            inlineEditorState = null;
             const week = getActiveWeek();
             document.getElementById('modalDayIndex').value = dayIdx;
             document.getElementById('modalTaskId').value = taskId;
@@ -1362,11 +1354,11 @@
                 const isSelected = key === activeKey;
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.style.backgroundColor = meta.bg;
+                btn.style.background = isSelected ? `linear-gradient(145deg, ${meta.bg}, var(--card-elevated))` : 'var(--card-elevated)';
                 btn.style.color = meta.color;
-                btn.style.borderColor = isSelected ? meta.color : 'transparent';
-                btn.className = `py-1.5 px-2 rounded-lg border-2 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer ${isSelected ? 'scale-105 shadow-xs' : 'opacity-80 hover:opacity-100'}`;
-                btn.innerHTML = `<span>${meta.icon}</span><span>${meta.label}</span>`;
+                btn.style.borderColor = isSelected ? meta.color : 'color-mix(in srgb, var(--border-ornament) 42%, transparent)';
+                btn.className = `activity-category-card ${isSelected ? 'selected' : 'opacity-85 hover:opacity-100'}`;
+                btn.innerHTML = `<span class="category-emoji">${meta.icon}</span><span class="text-[11px] font-extrabold tracking-wide">${meta.label}</span>${isSelected ? '<span class="text-[9px] uppercase tracking-widest">Elegida</span>' : ''}`;
                 btn.onclick = () => renderModalCategories(key);
                 container.appendChild(btn);
             });
@@ -1575,10 +1567,10 @@
             if (!origin) return;
             const rect = origin.getBoundingClientRect();
             const colors = ['#F8D98A', '#FFFFFF', '#D4A349', '#A9D8FF', '#F6C7E8'];
-            for (let i = 0; i < 14; i++) {
+            for (let i = 0; i < 9; i++) {
                 const particle = document.createElement('span');
-                const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.28;
-                const distance = 15 + Math.random() * 25;
+                const angle = (Math.PI * 2 * i) / 9 + (Math.random() - 0.5) * 0.22;
+                const distance = 13 + Math.random() * 20;
                 particle.className = 'light-particle';
                 particle.style.left = `${rect.left + rect.width / 2}px`;
                 particle.style.top = `${rect.top + rect.height / 2}px`;
@@ -1586,8 +1578,8 @@
                 particle.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
                 particle.style.background = colors[i % colors.length];
                 particle.style.color = colors[i % colors.length];
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 850);
+                requestAnimationFrame(() => document.body.appendChild(particle));
+                setTimeout(() => particle.remove(), 760);
             }
         }
 
