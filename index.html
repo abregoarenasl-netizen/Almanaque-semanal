@@ -122,7 +122,10 @@
         .day-filter-btn { min-width:36px; border-radius:999px; padding:7px 11px; font-size:11px; font-weight:800; border:1px solid transparent; transition:transform .22s ease, background .22s ease, box-shadow .22s ease; }
         .day-filter-btn:active { transform:scale(.93); }
         .activity-category-card { min-height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border:1px solid color-mix(in srgb, var(--border-ornament) 42%, transparent); border-radius:14px; padding:10px 6px; transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-        .activity-category-card .category-emoji { font-size:25px; line-height:1; filter:drop-shadow(0 2px 5px rgba(0,0,0,.25)); }
+        .activity-category-card .category-symbol { font-family:'Playfair Display',serif; font-size:27px; line-height:1; filter:drop-shadow(0 2px 5px rgba(0,0,0,.25)); }
+        .category-edit-btn { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-gold); opacity:.8; }
+        .day-heading { font-family:'Cinzel Decorative','Playfair Display',serif; font-size:clamp(1.15rem,2.5vw,1.65rem); line-height:1.15; letter-spacing:.055em; font-weight:900; }
+        .day-date-line { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; opacity:.9; margin-top:5px; }
         .activity-category-card.selected { transform:translateY(-2px); box-shadow:0 0 0 1px var(--accent-gold), 0 7px 18px rgba(0,0,0,.25), 0 0 18px var(--aura-glow); }
         .activity-modal-panel { background:radial-gradient(circle at 90% 0%, var(--aura-glow), transparent 42%), var(--card-bg); box-shadow:0 24px 80px rgba(0,0,0,.6), inset 0 0 0 1px color-mix(in srgb, var(--accent-gold) 22%, transparent); }
         .day-open-animation { animation:dayReveal .48s cubic-bezier(.16,1,.3,1) both; transform-origin:top center; will-change:opacity,transform; }
@@ -279,7 +282,7 @@
     <div class="max-w-[1720px] mx-auto relative z-10 space-y-5">
 
         <!-- =================================================================
-             1. PORTADA EDITORIAL ART NOUVEAU + SELECTOR DE TEORÍA DEL COLOR
+             1. PORTADA EDITORIAL ART NOUVEAU
         ================================================================== -->
         <header class="nouveau-frame p-5 sm:p-6 overflow-hidden">
             <!-- Filigranas SVG Art Nouveau en las 4 esquinas -->
@@ -300,21 +303,21 @@
                 <circle cx="10" cy="10" r="2.2" fill="currentColor" />
             </svg>
 
-            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 px-2 sm:px-4">
+            <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_25rem] xl:items-center gap-5 px-2 sm:px-4">
                 <!-- Encabezado editorial del organizador -->
-                <div class="space-y-2 flex-1 py-1">
+                <div class="space-y-2 flex-1 py-2 text-center xl:text-left">
                     <div class="font-display text-3xl sm:text-4xl lg:text-5xl font-black tracking-wide leading-tight" style="color:var(--accent-gold); text-shadow:0 2px 18px var(--aura-glow);">
                         Organizador semanal
                     </div>
-                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-3">
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-3 justify-center xl:justify-start">
                         <span id="weekDatesLabel" class="font-nouveau text-lg sm:text-xl tracking-wide" style="color:var(--ink-muted);">Cargando fechas...</span>
                     </div>
                 </div>
 
                 <!-- Progreso protagonista y selector cromático secundario -->
-                <div class="flex flex-col gap-1.5 xl:items-end">
+                <div class="flex flex-col gap-1.5 xl:items-stretch">
                     <!-- Medidor General de Avance Semanal -->
-                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="px-4 py-3.5 rounded-2xl border w-full xl:w-[25rem] relative overflow-hidden shadow-xl">
+                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="px-4 py-4 rounded-2xl border w-full relative overflow-hidden shadow-xl">
                         <div class="flex justify-between items-center text-sm font-bold mb-2">
                             <span class="font-nouveau text-base sm:text-lg tracking-wide" style="color:var(--ink-dark);">✦ Progreso semanal</span>
                             <span id="globalProgressText" style="color: var(--accent-gold);" class="font-extrabold">0% (0/0)</span>
@@ -324,66 +327,7 @@
                         </div>
                     </div>
 
-                    <!-- Selector con Diagrama de Círculo Cromático -->
-                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="p-2 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center gap-2 scale-[.96] origin-right">
-                        <!-- Mini Diagrama SVG del Círculo Cromático -->
-                        <div class="flex items-center gap-2.5">
-                            <svg id="colorWheelSvg" class="w-8 h-8 flex-shrink-0" viewBox="0 0 60 60">
-                                <!-- Anillo cromático sutil -->
-                                <circle cx="30" cy="30" r="24" fill="none" stroke="var(--border-ornament)" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
-                                <circle cx="30" cy="30" r="16" fill="none" stroke="var(--border-ornament)" stroke-width="0.8" opacity="0.35"/>
-                                <!-- Líneas geométricas dinámicas de armonía -->
-                                <g id="wheelHarmonyLines" stroke="var(--accent-gold)" stroke-width="1.8" fill="none"></g>
-                                <!-- Nodos de color activos -->
-                                <g id="wheelHarmonyNodes"></g>
-                            </svg>
-                            <div>
-                                <div class="text-[9px] font-bold uppercase tracking-wider opacity-70">Teoría del Color</div>
-                                <div id="harmonyDescription" class="font-nouveau text-[11px] font-bold">Complementarios (180°)</div>
-                            </div>
-                        </div>
 
-                        <!-- Botones de los 3 Temas -->
-                        <div class="flex flex-wrap gap-1.5">
-                            <button
-                                onclick="setColorTheme('complementarios')"
-                                id="btn-theme-complementarios"
-                                class="nouveau-btn px-2.5 py-1.5 text-xs flex items-center gap-1.5"
-                            >
-                                <span class="inline-flex -space-x-1">
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#3B6FA6;"></span>
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#C86A47;"></span>
-                                </span>
-                                <span>Complementarios</span>
-                            </button>
-
-                            <button
-                                onclick="setColorTheme('triada')"
-                                id="btn-theme-triada"
-                                class="nouveau-btn px-2.5 py-1.5 text-xs flex items-center gap-1.5"
-                            >
-                                <span class="inline-flex -space-x-1">
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#4A8B74;"></span>
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#9B5684;"></span>
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#D69E42;"></span>
-                                </span>
-                                <span>Tríada</span>
-                            </button>
-
-                            <button
-                                onclick="setColorTheme('analogos')"
-                                id="btn-theme-analogos"
-                                class="nouveau-btn px-2.5 py-1.5 text-xs flex items-center gap-1.5"
-                            >
-                                <span class="inline-flex -space-x-1">
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#438A74;"></span>
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#397E91;"></span>
-                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#B5A34C;"></span>
-                                </span>
-                                <span>Análogos</span>
-                            </button>
-                        </div>
-                    </div>
 
                 </div>
             </div>
@@ -410,21 +354,22 @@
         </section>
 
         <!-- =================================================================
-             3. AGENDA HORARIA DIARIA (06:30 A 23:00) — COLUMNAS DESLIZABLES
+             3. AGENDA HORARIA DIARIA — COLUMNAS DESLIZABLES
         ================================================================== -->
         <section aria-label="Agenda horaria semanal">
             <!-- Navegación semanal ubicada directamente sobre los días -->
-            <div class="flex flex-wrap items-center gap-2 mb-3 px-1">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
                 <button onclick="changeWeek(-1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">← Semana anterior</button>
                 <button onclick="changeWeek(0)" style="background-color:var(--primary);color:#FAF6EE;" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">✦ Hoy</button>
                 <button onclick="changeWeek(1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">Semana siguiente →</button>
+                <button onclick="openScheduleModal(focusedDayIndex === null ? ((new Date().getDay()+6)%7) : focusedDayIndex, '09:00')" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#FAF6EE;border-color:var(--accent-gold);box-shadow:0 5px 18px var(--aura-glow);" class="nouveau-btn px-4 py-2 text-xs sm:text-sm font-extrabold">＋ Agendar actividad</button>
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-3 px-1">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-3 px-1">
                 <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda horaria</h2>
-                <div class="day-filter-track flex flex-wrap items-center gap-1.5">
+                <div class="day-filter-track flex flex-wrap items-center gap-1.5 self-start lg:self-auto">
                     <span class="text-xs font-semibold opacity-75 mr-1 px-1">Ir a día</span>
-                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="day-filter-btn">Todos (7)</button>
+                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="day-filter-btn">Todos</button>
                     <div id="dayQuickJumpButtons" class="flex flex-wrap gap-1"></div>
                 </div>
             </div>
@@ -531,6 +476,29 @@
                 </div>
             </div>
         </section>
+
+        <!-- Ajustes cromáticos: sección secundaria al final del organizador -->
+        <section class="nouveau-frame p-4 sm:p-5">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-full border flex items-center justify-center" style="border-color:var(--border-ornament);color:var(--accent-gold);">
+                        <svg viewBox="0 0 60 60" class="w-7 h-7" fill="none"><circle cx="30" cy="30" r="23" stroke="currentColor" stroke-dasharray="2 3"/><path d="M30 7a23 23 0 0 1 0 46 23 23 0 0 1 0-46Z" stroke="currentColor"/><path d="M30 7v46M7 30h46" stroke="currentColor" opacity=".6"/></svg>
+                    </span>
+                    <div><h2 class="font-nouveau text-xl font-bold">Teoría del color</h2><p class="text-xs opacity-65">Ajustes de armonía y paleta visual</p></div>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <svg id="colorWheelSvg" class="w-9 h-9 flex-shrink-0" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--border-ornament)" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/><circle cx="30" cy="30" r="16" fill="none" stroke="var(--border-ornament)" stroke-width=".8" opacity=".35"/><g id="wheelHarmonyLines" stroke="var(--accent-gold)" stroke-width="1.8" fill="none"></g><g id="wheelHarmonyNodes"></g></svg>
+                        <div><div class="text-[9px] font-bold uppercase tracking-wider opacity-70">Armonía activa</div><div id="harmonyDescription" class="font-nouveau text-xs font-bold">Complementarios (180°)</div></div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setColorTheme('complementarios')" id="btn-theme-complementarios" class="nouveau-btn px-3 py-2 text-xs flex items-center gap-2"><span class="inline-flex -space-x-1"><span class="w-3 h-3 rounded-full border border-white/70" style="background:#3B6FA6"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#C86A47"></span></span>Complementarios</button>
+                        <button onclick="setColorTheme('triada')" id="btn-theme-triada" class="nouveau-btn px-3 py-2 text-xs flex items-center gap-2"><span class="inline-flex -space-x-1"><span class="w-3 h-3 rounded-full border border-white/70" style="background:#4A8B74"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#9B5684"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#D69E42"></span></span>Tríada</button>
+                        <button onclick="setColorTheme('analogos')" id="btn-theme-analogos" class="nouveau-btn px-3 py-2 text-xs flex items-center gap-2"><span class="inline-flex -space-x-1"><span class="w-3 h-3 rounded-full border border-white/70" style="background:#438A74"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#397E91"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#B5A34C"></span></span>Análogos</button>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- =================================================================
@@ -541,8 +509,8 @@
             <button onclick="closeScheduleModal()" style="border-color: var(--border-ornament);" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:bg-white/10 absolute top-4 right-4">
                 ✕
             </button>
-            <div class="mb-5 pr-8"><div class="text-[10px] uppercase tracking-[.24em] font-extrabold mb-1" style="color:var(--accent-gold);">✦ Nueva entrada</div><h3 id="modalTitle" class="font-display text-2xl sm:text-3xl font-bold">Agendar actividad</h3></div>
-            <p id="modalSubtitle" class="text-xs font-semibold opacity-75 mb-4">Día y franja horaria</p>
+            <div class="mb-5 pr-8"><div class="text-[10px] uppercase tracking-[.24em] font-extrabold mb-1" style="color:var(--accent-gold);">✦ Organizador personal</div><h3 id="modalTitle" class="font-display text-2xl sm:text-3xl font-bold">Agendar actividad</h3></div>
+            <p id="modalSubtitle" class="text-xs font-semibold opacity-75 mb-4">Día seleccionado</p>
 
             <form onsubmit="submitScheduleModal(event)" class="space-y-4">
                 <input type="hidden" id="modalDayIndex" />
@@ -570,7 +538,8 @@
 
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5">Categoría</label>
-                    <div id="modalCategorySelector" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+                    <div id="modalCategorySelector" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
+                    <p class="text-[10px] opacity-60 mt-2">Podés personalizar el nombre y el símbolo de cada categoría desde ✎ Editar.</p>
                     <input type="hidden" id="modalCategoryValue" value="trabajo" />
                 </div>
 
@@ -609,13 +578,13 @@
         ];
 
         // Categorías con paletas oscuras profundas y contrastadas para modo nocturno
-        const CATEGORIES = {
-            trabajo:     { label: 'Trabajo',     color: '#6BA2DC', bg: 'rgba(59, 111, 166, 0.24)', icon: '✒' },
-            estudio:     { label: 'Estudio',     color: '#C782B0', bg: 'rgba(155, 86, 132, 0.24)', icon: '📖' },
-            bienestar:   { label: 'Bienestar',   color: '#6CC2A4', bg: 'rgba(74, 139, 116, 0.24)', icon: '🌿' },
-            creatividad: { label: 'Creatividad', color: '#E38A68', bg: 'rgba(200, 106, 71, 0.24)', icon: '🎨' },
-            personal:    { label: 'Personal',    color: '#E3B962', bg: 'rgba(212, 163, 73, 0.22)', icon: '🕯' }
+        let CATEGORIES = {
+            trabajo: { label: 'Trabajo', color: '#6BA2DC', bg: 'rgba(59, 111, 166, 0.24)', icon: '✒' },
+            personal: { label: 'Personal', color: '#6CC2A4', bg: 'rgba(74, 139, 116, 0.24)', icon: '❧' },
+            creativo: { label: 'Creativo', color: '#E3B962', bg: 'rgba(212, 163, 73, 0.22)', icon: '✧' }
         };
+        const DEFAULT_CATEGORIES = JSON.parse(JSON.stringify(CATEGORIES));
+        const CATEGORY_SYMBOLS = ['✒','❧','✧','✦','◇','◈','⌘','⚜','☼','☾','♧','※','∞','⊹'];
 
         // Configuración geométrica del diagrama SVG del círculo cromático para cada tema
         const COLOR_THEORY_META = {
@@ -703,6 +672,13 @@
             return d.getDate();
         }
 
+        function formatDayDate(mondayISO, dayIdx) {
+            const d = new Date(mondayISO + 'T00:00:00');
+            d.setDate(d.getDate() + dayIdx);
+            const months = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+            return `${d.getDate()} DE ${months[d.getMonth()]}`;
+        }
+
         function createDefaultWeekData() {
             return {
                 title: '',
@@ -729,6 +705,12 @@
             }
 
             if (!appState.weeks || typeof appState.weeks !== 'object') appState.weeks = {};
+            if (appState.categories && typeof appState.categories === 'object') {
+                Object.keys(DEFAULT_CATEGORIES).forEach(key => {
+                    const savedCat = appState.categories[key] || {};
+                    CATEGORIES[key] = { ...DEFAULT_CATEGORIES[key], ...savedCat };
+                });
+            } else { appState.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)); }
             const mondayKey = getMondayISO(weekOffset);
             if (!appState.weeks[mondayKey]) appState.weeks[mondayKey] = createDefaultWeekData();
 
@@ -1094,22 +1076,13 @@
                     <!-- Encabezado ilustrado nocturno del día -->
                     <div style="background-color: ${headerBg}; color: #FAF6EE; border-color: var(--accent-gold);" class="p-3 border-b-2 flex-shrink-0">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-nouveau opacity-85 border border-white/40 rounded px-1.5 py-0.5">${dayMeta.roman}</span>
-                                <h3 class="font-nouveau text-lg font-bold tracking-wide">${dayMeta.name}</h3>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <span style="background-color: var(--bg-paper-deep); color: var(--accent-gold);" class="text-xs font-extrabold px-2 py-0.5 rounded-full border border-white/20">
-                                    ${dayNum}
-                                </span>
-                                <button
-                                    type="button"
-                                    onclick="openScheduleModal(${dayIdx}, '09:00')"
-                                    title="Agendar en ${dayMeta.name}"
-                                    class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-2 py-0.5 rounded border border-white/40 cursor-pointer"
-                                >
-                                    +
-                                </button>
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2"><span class="text-[10px] font-nouveau opacity-80 border border-white/40 rounded px-1.5 py-0.5">${dayMeta.roman}</span><span class="text-[9px] uppercase tracking-[.22em] opacity-75">Agenda diaria</span></div>
+                                    <h3 class="day-heading mt-2">${dayMeta.name.toUpperCase()}</h3>
+                                    <div class="day-date-line">${formatDayDate(mondayISO, dayIdx)}</div>
+                                </div>
+                                <button type="button" onclick="openScheduleModal(${dayIdx}, '09:00')" title="Agendar en ${dayMeta.name}" aria-label="Agendar actividad" style="background:var(--bg-paper-deep);color:var(--accent-gold);border-color:var(--accent-gold);box-shadow:0 0 16px var(--aura-glow);" class="w-11 h-11 flex-shrink-0 rounded-xl border-2 flex items-center justify-center text-2xl font-bold hover:scale-105 transition-transform">＋</button>
                             </div>
                         </div>
 
@@ -1136,7 +1109,7 @@
                         html += `
                             <div style="background-color: var(--primary-soft);" class="p-2.5 space-y-2 border-l-4 border-current">
                                 <div class="flex items-center justify-between">
-                                    <span style="color: var(--accent-gold);" class="text-xs font-extrabold">🕰 ${slotHour} — Nueva actividad</span>
+                                    <span style="color: var(--accent-gold);" class="text-xs font-extrabold">${slotHour} — Nueva actividad</span>
                                     <button type="button" onclick="closeInlineEditor()" class="text-xs font-bold opacity-70 hover:opacity-100">✕</button>
                                 </div>
                                 <form onsubmit="saveInlineTask(event, ${dayIdx}, '${slotHour}')" class="space-y-2">
@@ -1151,10 +1124,8 @@
                                     <div class="flex items-center justify-between gap-1.5">
                                         <select id="inlineTaskCategory" style="background-color: var(--bg-paper-deep); color: var(--ink-dark);" class="px-2 py-1 rounded border border-white/25 text-[11px] font-bold">
                                             <option value="trabajo">✒ Trabajo</option>
-                                            <option value="estudio">📖 Estudio</option>
-                                            <option value="bienestar">🌿 Bienestar</option>
-                                            <option value="creatividad">🎨 Creatividad</option>
-                                            <option value="personal">🕯 Personal</option>
+                                            <option value="personal">❧ Personal</option>
+                                            <option value="creativo">✧ Creativo</option>
                                         </select>
                                         <button type="submit" style="background-color: var(--primary); color: #FAF6EE;" class="px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer">
                                             Guardar
@@ -1271,7 +1242,7 @@
                 id: 'tk_' + Date.now() + Math.random().toString(36).slice(2, 5),
                 hour,
                 text,
-                category: catEl.value || 'trabajo',
+                category: CATEGORIES[catEl.value] ? catEl.value : 'trabajo',
                 done: false
             });
 
@@ -1324,13 +1295,13 @@
                     hourSelect.value = existing.hour || defaultHour;
                     selectedCat = existing.category || 'trabajo';
                 }
-                document.getElementById('modalTitle').textContent = 'Editar Actividad';
+                document.getElementById('modalTitle').textContent = 'Editar actividad';
             } else {
                 document.getElementById('modalTaskText').value = '';
-                document.getElementById('modalTitle').textContent = 'Agendar en Horario';
+                document.getElementById('modalTitle').textContent = 'Agendar actividad';
             }
 
-            document.getElementById('modalSubtitle').textContent = `${DAYS_CONFIG[dayIdx].name} • Franja entre 06:30 y 23:00`;
+            document.getElementById('modalSubtitle').textContent = `${DAYS_CONFIG[dayIdx].name} · ${formatDayDate(getMondayISO(weekOffset), dayIdx)}`;
             renderModalCategories(selectedCat);
 
             const modal = document.getElementById('scheduleModal');
@@ -1346,21 +1317,44 @@
         }
 
         function renderModalCategories(activeKey) {
+            if (!CATEGORIES[activeKey]) activeKey = Object.keys(CATEGORIES)[0];
             document.getElementById('modalCategoryValue').value = activeKey;
             const container = document.getElementById('modalCategorySelector');
             container.innerHTML = '';
 
             Object.entries(CATEGORIES).forEach(([key, meta]) => {
                 const isSelected = key === activeKey;
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.style.background = isSelected ? `linear-gradient(145deg, ${meta.bg}, var(--card-elevated))` : 'var(--card-elevated)';
-                btn.style.color = meta.color;
-                btn.style.borderColor = isSelected ? meta.color : 'color-mix(in srgb, var(--border-ornament) 42%, transparent)';
-                btn.className = `activity-category-card ${isSelected ? 'selected' : 'opacity-85 hover:opacity-100'}`;
-                btn.innerHTML = `<span class="category-emoji">${meta.icon}</span><span class="text-[11px] font-extrabold tracking-wide">${meta.label}</span>${isSelected ? '<span class="text-[9px] uppercase tracking-widest">Elegida</span>' : ''}`;
-                btn.onclick = () => renderModalCategories(key);
-                container.appendChild(btn);
+                const card = document.createElement('div');
+                card.className = `activity-category-card ${isSelected ? 'selected' : 'opacity-85 hover:opacity-100'}`;
+                card.style.background = isSelected ? `linear-gradient(145deg, ${meta.bg}, var(--card-elevated))` : 'var(--card-elevated)';
+                card.style.color = meta.color;
+                card.style.borderColor = isSelected ? meta.color : 'color-mix(in srgb, var(--border-ornament) 42%, transparent)';
+                const choose = document.createElement('button');
+                choose.type = 'button';
+                choose.className = 'w-full flex flex-col items-center gap-1';
+                choose.innerHTML = `<span class="category-symbol">${escapeHtml(meta.icon)}</span><span class="text-[11px] font-extrabold tracking-wide">${escapeHtml(meta.label)}</span>${isSelected ? '<span class="text-[9px] uppercase tracking-widest">Elegida</span>' : ''}`;
+                choose.onclick = () => renderModalCategories(key);
+                const edit = document.createElement('button');
+                edit.type = 'button';
+                edit.className = 'category-edit-btn mt-1';
+                edit.textContent = '✎ Editar';
+                edit.onclick = () => {
+                    const nextName = prompt('Nombre de la categoría:', meta.label);
+                    if (nextName === null) return;
+                    const cleanName = nextName.trim().slice(0, 22);
+                    if (!cleanName) { triggerToast('El nombre no puede quedar vacío'); return; }
+                    const nextSymbol = prompt('Elegí un símbolo ornamental (no emoji):\n' + CATEGORY_SYMBOLS.join('  '), meta.icon);
+                    if (nextSymbol === null) return;
+                    const cleanSymbol = nextSymbol.trim().slice(0, 3) || meta.icon;
+                    CATEGORIES[key] = { ...meta, label: cleanName, icon: cleanSymbol };
+                    appState.categories = JSON.parse(JSON.stringify(CATEGORIES));
+                    saveState(false);
+                    renderModalCategories(key);
+                    renderWeeklySchedule(getMondayISO(weekOffset), getActiveWeek());
+                };
+                card.appendChild(choose);
+                card.appendChild(edit);
+                container.appendChild(card);
             });
         }
 
