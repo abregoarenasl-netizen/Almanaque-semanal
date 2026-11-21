@@ -267,20 +267,28 @@
         .theme-option { min-height: 62px; background:var(--card-elevated); color:var(--ink-dark); border-color:color-mix(in srgb,var(--border-ornament) 65%,transparent); }
         .theme-option[style*="background-color: var(--primary)"] { box-shadow:0 0 0 1px var(--accent-gold),0 5px 16px var(--aura-glow); }
         .day-add-activity { min-height:42px; }
+        /* Presentación móvil: jerarquía compacta y controles siempre visibles */
         @media (max-width: 767px) {
             body { padding:10px !important; }
             .max-w-\[1720px\] { width:100%; }
-            header.nouveau-frame { padding:18px 13px !important; }
-            header .font-display { font-size:clamp(1.65rem,8vw,2.35rem) !important; line-height:1.15 !important; overflow-wrap:anywhere; }
-            #weekDatesLabel { font-size:clamp(.95rem,4.3vw,1.15rem) !important; text-align:center; }
-            #globalProgressText { font-size:11px; white-space:nowrap; }
+            header.nouveau-frame { padding:15px 12px !important; }
+            header .grid { gap:11px !important; padding-left:2px !important; padding-right:2px !important; }
+            header .space-y-2 { padding-top:0 !important; padding-bottom:0 !important; gap:5px !important; }
+            header .font-display { font-size:clamp(1.48rem,7.2vw,2rem) !important; line-height:1.12 !important; overflow-wrap:anywhere; }
+            #weekDatesLabel { display:inline-block; font-size:clamp(.82rem,3.8vw,1rem) !important; text-align:center; padding:5px 10px; border:1px solid color-mix(in srgb,var(--border-ornament) 50%,transparent); border-radius:999px; }
+            header .flex.flex-col.gap-1\.5 { gap:0 !important; }
+            header .flex.flex-col.gap-1\.5 > div { padding:11px 12px !important; border-radius:13px !important; }
+            header .flex.flex-col.gap-1\.5 .font-nouveau { font-size:14px !important; }
+            header .flex.flex-col.gap-1\.5 .h-3 { height:9px !important; }
+            #globalProgressText { font-size:10px; white-space:nowrap; }
             .nouveau-frame { border-radius:15px; }
-            section[aria-label="Agenda horaria semanal"] .flex.flex-wrap.items-center.justify-between { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-            section[aria-label="Agenda horaria semanal"] .flex.flex-wrap.items-center.justify-between > button { min-height:40px; padding:8px 6px; font-size:11px; }
-            section[aria-label="Agenda horaria semanal"] .flex.flex-col.lg\:flex-row { align-items:stretch; }
-            .day-filter-track { width:100%; border-radius:14px; overflow-x:auto; flex-wrap:nowrap !important; white-space:nowrap; padding:7px; }
-            #dayQuickJumpButtons { flex-wrap:nowrap !important; }
-            .day-filter-btn { flex:0 0 auto; min-width:39px; }
+            section[aria-label="Agenda diaria semanal"] > .flex.flex-wrap.items-center.justify-between { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+            section[aria-label="Agenda diaria semanal"] > .flex.flex-wrap.items-center.justify-between > button { min-width:0; min-height:42px; padding:7px 3px; font-size:10px; white-space:nowrap; }
+            section[aria-label="Agenda diaria semanal"] .flex.flex-col.lg\:flex-row { align-items:stretch; }
+            .day-jump-panel { display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; border-radius:13px; overflow:visible; white-space:normal; padding:8px; gap:6px; }
+            .day-jump-label { grid-column:1 / -1; margin:0; padding:0 2px 2px; }
+            #dayQuickJumpButtons { display:contents !important; }
+            .day-jump-panel > .day-filter-btn, #dayQuickJumpButtons .day-filter-btn { min-width:0; width:100%; min-height:34px; padding:6px 4px; }
             #weekDaysContainer { overflow:visible !important; padding-bottom:0; }
             #weekDaysGrid { display:grid !important; grid-template-columns:minmax(0,1fr) !important; width:100% !important; gap:13px !important; }
             #weekDaysGrid > article { width:100% !important; max-width:none !important; height:auto !important; min-height:0 !important; }
@@ -293,19 +301,32 @@
             #modalCategorySelector { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:7px !important; }
             .activity-category-card { min-height:72px; padding:8px 4px; }
             .activity-category-card .category-symbol { font-size:23px; }
-            .theme-options { grid-template-columns:repeat(3,minmax(0,1fr)); }
-            .theme-option { padding:9px 5px; min-height:58px; }
-            .theme-option span { font-size:22px; }
+            .themes-compact-row { padding:7px 9px !important; gap:9px; }
+            .themes-compact-row h2 { font-size:12px !important; white-space:nowrap; }
+            .theme-options { display:flex !important; flex:1; justify-content:flex-end; gap:6px !important; }
+            .theme-option { flex:0 0 34px; width:34px; min-height:32px; height:32px; padding:3px !important; }
+            .theme-option span { font-size:17px !important; line-height:1; }
             .grid.grid-cols-1.lg\:grid-cols-12 { gap:13px; }
             input,select,textarea { max-width:100%; min-width:0; }
         }
+        /* Tablet: dos columnas amplias, sin desbordes laterales */
         @media (min-width: 768px) and (max-width: 1199px) {
             #weekDaysGrid { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; width:100% !important; gap:14px !important; }
             #weekDaysContainer { overflow:visible !important; }
             #weekDaysGrid > article { width:100% !important; max-width:none !important; height:590px; }
+            .themes-compact-row { padding:8px 12px !important; }
         }
+        /* Escritorio: cada jornada ocupa el ancho disponible, no una tarjeta angosta */
         @media (min-width: 1200px) {
-            #weekDaysGrid > article { max-width:285px; }
+            #weekDaysContainer { overflow:visible !important; }
+            #weekDaysGrid { display:grid !important; grid-template-columns:minmax(0,1fr) !important; width:100% !important; gap:18px !important; }
+            #weekDaysGrid > article { width:100% !important; max-width:none !important; height:calc(100vh - 245px) !important; min-height:620px; }
+            #weekDaysGrid > article .timeline-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; }
+            .themes-compact-row { padding:6px 10px !important; gap:10px; }
+            .themes-compact-row h2 { font-size:12px !important; }
+            .theme-options { display:flex !important; gap:5px !important; }
+            .theme-option { flex:0 0 30px; width:30px; min-height:28px; height:28px; padding:2px !important; }
+            .theme-option span { font-size:15px !important; line-height:1; }
         }
         @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
     </style>
@@ -402,7 +423,7 @@
         <!-- =================================================================
              3. AGENDA HORARIA DIARIA — COLUMNAS DESLIZABLES
         ================================================================== -->
-        <section aria-label="Agenda horaria semanal">
+        <section aria-label="Agenda diaria semanal">
             <!-- Navegación semanal ubicada directamente sobre los días -->
             <div class="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
                 <button onclick="changeWeek(-1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">← Semana anterior</button>
@@ -411,9 +432,9 @@
             </div>
 
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-3 px-1">
-                <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda horaria</h2>
-                <div class="day-filter-track flex flex-wrap items-center gap-1.5 self-start lg:self-auto">
-                    <span class="text-xs font-semibold opacity-75 mr-1 px-1">Ir a día</span>
+                <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda diaria</h2>
+                <div class="day-filter-track day-jump-panel flex flex-wrap items-center gap-1.5 self-start lg:self-auto">
+                    <span class="day-jump-label text-xs font-semibold opacity-75 mr-1 px-1">Ir a día</span>
                     <button onclick="setFocusedDay(null)" id="focus-btn-all" class="day-filter-btn">Todos</button>
                     <div id="dayQuickJumpButtons" class="flex flex-wrap gap-1"></div>
                 </div>
@@ -523,12 +544,12 @@
         </section>
 
         <!-- Selector simple de temas -->
-        <section class="nouveau-frame p-4 sm:p-5">
-            <h2 class="font-nouveau text-xl sm:text-2xl font-bold mb-3">Temas</h2>
-            <div class="theme-options grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <button onclick="setColorTheme('complementarios')" id="btn-theme-complementarios" title="Medianoche" aria-label="Tema Medianoche" class="nouveau-btn theme-option px-3 py-3 text-sm font-bold flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🌌</span></button>
-                <button onclick="setColorTheme('triada')" id="btn-theme-triada" title="Tríada" aria-label="Tema Tríada" class="nouveau-btn theme-option px-3 py-3 text-sm font-bold flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🌺</span></button>
-                <button onclick="setColorTheme('analogos')" id="btn-theme-analogos" title="Botánico" aria-label="Tema Botánico" class="nouveau-btn theme-option px-3 py-3 text-sm font-bold flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🌿</span></button>
+        <section class="nouveau-frame themes-compact-row" aria-label="Temas">
+            <h2 class="font-nouveau font-bold">Temas</h2>
+            <div class="theme-options">
+                <button onclick="setColorTheme('complementarios')" id="btn-theme-complementarios" title="Medianoche" aria-label="Tema Medianoche" class="nouveau-btn theme-option"><span aria-hidden="true">🌌</span></button>
+                <button onclick="setColorTheme('triada')" id="btn-theme-triada" title="Tríada" aria-label="Tema Tríada" class="nouveau-btn theme-option"><span aria-hidden="true">🌺</span></button>
+                <button onclick="setColorTheme('analogos')" id="btn-theme-analogos" title="Botánico" aria-label="Tema Botánico" class="nouveau-btn theme-option"><span aria-hidden="true">🌿</span></button>
             </div>
         </section>
     </div>
@@ -992,7 +1013,7 @@
         }
 
         /* =====================================================================
-           AGENDA HORARIA DIARIA (06:30 A 23:00) — COLUMNAS DESLIZABLES IZQ/DER
+           AGENDA DIARIA — VISTA SEMANAL
         ===================================================================== */
         function slideDaysTrack(direction) {
             const container = document.getElementById('weekDaysContainer');
@@ -1103,7 +1124,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
-                                    <div class="flex items-center gap-2"><span class="text-[10px] font-nouveau opacity-80 border border-white/40 rounded px-1.5 py-0.5">${dayMeta.roman}</span><span class="text-[9px] uppercase tracking-[.22em] opacity-75">Agenda diaria</span></div>
+                                    <div class="flex items-center gap-2"><span class="text-[10px] font-nouveau opacity-80 border border-white/40 rounded px-1.5 py-0.5">${dayMeta.roman}</span></div>
                                     <h3 class="day-heading mt-2">${dayMeta.name.toUpperCase()}</h3>
                                     <div class="day-date-line">${formatDayDate(mondayISO, dayIdx)}</div>
                                 </div>
