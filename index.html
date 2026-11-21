@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0D141F">
+    <meta name="description" content="Organizador semanal personal: prioridades, agenda, hábitos, notas y tareas.">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <title>Almanaque Semanal — Art Nouveau & Botánico</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display (Editorial Art Nouveau) & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =====================================================================
+           SISTEMA CROMÁTICO NOCTURNO Y MISTERIOSO BASADO EN TEORÍA DEL COLOR
+           Grimorio / Atlas Botánico de Medianoche — Sin estridencias ni minimalismo
+        ===================================================================== */
+
+        /* TEMA 1: COMPLEMENTARIOS (180°) — Azul Medianoche Profundo & Terracota Cobrizo */
+        :root, [data-theme="complementarios"] {
+            --bg-paper: #0D141F;
+            --bg-paper-deep: #090E16;
+            --card-bg: #141E2E;
+            --card-elevated: #1A273B;
+            --primary: #3B6FA6;         /* Azul Medianoche Luminoso */
+            --primary-light: #538AC4;
+            --primary-soft: rgba(59, 111, 166, 0.22);
+            --secondary: #C86A47;       /* Terracota Cobrizo (Opuesto complementario) */
+            --secondary-soft: rgba(200, 106, 71, 0.22);
+            --accent-gold: #D4A349;     /* Oro Envejecido */
+            --ink-dark: #F2ECE1;
+            --ink-muted: #A7B3C4;
+            --border-ornament: #B68A3E;
+            --slot-hover: rgba(212, 163, 73, 0.10);
+            --pattern-tint: rgba(212, 163, 73, 0.065);
+            --aura-glow: rgba(59, 111, 166, 0.16);
+        }
+
+        /* TEMA 2: TRÍADA ARMÓNICA (120°) — Esmeralda Nocturno, Ciruela Umbría & Ámbar Antiguo */
+        [data-theme="triada"] {
+            --bg-paper: #120F18;
+            --bg-paper-deep: #0B0910;
+            --card-bg: #1B1624;
+            --card-elevated: #241D30;
+            --primary: #4A8B74;         /* Verde Esmeralda Nocturno */
+            --primary-light: #64A890;
+            --primary-soft: rgba(74, 139, 116, 0.22);
+            --secondary: #9B5684;       /* Ciruela Umbría */
+            --secondary-soft: rgba(155, 86, 132, 0.22);
+            --accent-gold: #D69E42;     /* Ámbar Antiguo */
+            --ink-dark: #F5EFE6;
+            --ink-muted: #B6ACC2;
+            --border-ornament: #B88738;
+            --slot-hover: rgba(155, 86, 132, 0.12);
+            --pattern-tint: rgba(155, 86, 132, 0.07);
+            --aura-glow: rgba(155, 86, 132, 0.16);
+        }
+
+        /* TEMA 3: ANÁLOGOS BOTÁNICOS (30°) — Bosque Sombrío, Jade Profundo & Abismo Cerceta */
+        [data-theme="analogos"] {
+            --bg-paper: #0B1513;
+            --bg-paper-deep: #070E0D;
+            --card-bg: #11201D;
+            --card-elevated: #172B27;
+            --primary: #438A74;         /* Jade Profundo */
+            --primary-light: #5AA890;
+            --primary-soft: rgba(67, 138, 116, 0.22);
+            --secondary: #397E91;       /* Abismo Cerceta */
+            --secondary-soft: rgba(57, 126, 145, 0.22);
+            --accent-gold: #B5A34C;     /* Latón Musgo Nocturno */
+            --ink-dark: #EDF5F2;
+            --ink-muted: #9CB5AE;
+            --border-ornament: #968741;
+            --slot-hover: rgba(67, 138, 116, 0.11);
+            --pattern-tint: rgba(67, 138, 116, 0.065);
+            --aura-glow: rgba(57, 126, 145, 0.16);
+        }
+
+        * {
+            transition: background-color 0.35s ease, border-color 0.35s ease, color 0.25s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-paper);
+            background-image:
+                radial-gradient(circle at 18% 8%, var(--aura-glow), transparent 42%),
+                radial-gradient(circle at 85% 22%, rgba(212, 163, 73, 0.08), transparent 45%),
+                radial-gradient(circle at 50% 95%, var(--aura-glow), transparent 50%);
+            color: var(--ink-dark);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Textura misteriosa de pergamino nocturno y filigrana botánica grabada */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20px 20px, var(--pattern-tint) 1.8px, transparent 2.4px),
+                radial-gradient(circle at 60px 60px, var(--pattern-tint) 1.4px, transparent 2px),
+                linear-gradient(to right, var(--pattern-tint) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--pattern-tint) 1px, transparent 1px);
+            background-size: 80px 80px, 80px 80px, 40px 40px, 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .font-nouveau {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        /* Marco Editorial Art Nouveau Nocturno con doble filete dorado y resplandor sutil */
+        .nouveau-frame {
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-ornament);
+            box-shadow:
+                inset 0 0 0 3px var(--card-bg),
+                inset 0 0 0 4px color-mix(in srgb, var(--border-ornament) 42%, transparent),
+                0 12px 28px -8px rgba(0, 0, 0, 0.65),
+                0 0 18px -6px var(--aura-glow);
+            border-radius: 1.15rem;
+            position: relative;
+        }
+
+        /* Botones estilo placa grabada nocturna */
+        .nouveau-btn {
+            border: 1.5px solid var(--border-ornament);
+            border-radius: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, background-color 0.25s ease, box-shadow 0.2s ease;
+        }
+
+        .nouveau-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+        }
+
+        .nouveau-btn:active {
+            transform: translateY(0);
+        }
+
+        /* =====================================================================
+           TOP 3 PRIORIDADES: DESPLAZAMIENTO HORIZONTAL CONDICIONAL
+           Solo se activa cuando el texto desborda el ancho visible
+        ===================================================================== */
+        .priority-scroll-viewport {
+            overflow-x: hidden;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-bottom: 2px;
+        }
+
+        .priority-scroll-viewport.has-overflow {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) var(--bg-paper-deep);
+            padding-bottom: 5px;
+        }
+
+        .priority-scroll-viewport.has-overflow::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .priority-scroll-viewport.has-overflow::-webkit-scrollbar-track {
+            background: var(--bg-paper-deep);
+            border-radius: 999px;
+            border: 1px solid color-mix(in srgb, var(--border-ornament) 35%, transparent);
+        }
+
+        .priority-scroll-viewport.has-overflow::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 999px;
+        }
+
+        /* Scroll vertical refinado para las franjas de 06:30 a 23:00 */
+        .timeline-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) var(--bg-paper-deep);
+        }
+
+        .timeline-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .timeline-scroll::-webkit-scrollbar-track {
+            background: var(--bg-paper-deep);
+        }
+
+        .timeline-scroll::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 999px;
+        }
+
+        /* Carril horizontal de columnas de días (siempre en columnas lado a lado, deslizable izq/der) */
+        .days-panorama {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) var(--bg-paper-deep);
+            scroll-behavior: smooth;
+        }
+
+        .days-panorama::-webkit-scrollbar {
+            height: 9px;
+        }
+
+        .days-panorama::-webkit-scrollbar-track {
+            background: var(--bg-paper-deep);
+            border-radius: 999px;
+            border: 1px solid color-mix(in srgb, var(--border-ornament) 30%, transparent);
+        }
+
+        .days-panorama::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--primary), var(--accent-gold));
+            border-radius: 999px;
+        }
+
+        /* Animación sutil de destello dorado al completar una tarea */
+        @keyframes goldShimmer {
+            0% { box-shadow: 0 0 0 0 rgba(212, 163, 73, 0.65); }
+            60% { box-shadow: 0 0 0 9px rgba(212, 163, 73, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 163, 73, 0); }
+        }
+
+        .shimmer-done {
+            animation: goldShimmer 0.8s ease-out;
+        }
+
+        /* Ornamentos florales de esquina */
+        .corner-ornament {
+            position: absolute;
+            width: 34px;
+            height: 34px;
+            color: var(--accent-gold);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .habit-particle { position:fixed; width:6px; height:6px; border-radius:50%; z-index:120; pointer-events:none; box-shadow:0 0 8px currentColor; animation:habitBurst .85s ease-out forwards; }
+        @keyframes habitBurst { 0% { opacity:1; transform:translate(-50%,-50%) scale(.5) rotate(0deg); } 100% { opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.7) rotate(180deg); } }
+    </style>
+</head>
+<body class="p-3 sm:p-5 lg:p-7" data-theme="complementarios">
+    <div id="authGate" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:var(--bg-paper);">
+        <div class="nouveau-frame w-full max-w-md p-6">
+            <div class="text-center mb-5"><div class="font-nouveau text-3xl font-bold">Almanaque Semanal</div><p class="text-sm opacity-75 mt-2">Iniciá sesión para sincronizar tus semanas</p></div>
+            <form id="loginForm" class="space-y-3">
+                <label class="block text-xs font-bold">Correo electrónico</label>
+                <input id="loginEmail" type="email" required autocomplete="username" placeholder="tu correo" class="w-full rounded-lg border px-3 py-2 text-sm" style="background:var(--card-elevated);border-color:var(--border-ornament);color:var(--ink-dark);">
+                <label class="block text-xs font-bold">Contraseña</label>
+                <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Tu contraseña" class="w-full rounded-lg border px-3 py-2 text-sm" style="background:var(--card-elevated);border-color:var(--border-ornament);color:var(--ink-dark);">
+                <p id="loginError" class="text-xs text-rose-400" role="alert"></p>
+                <button id="loginButton" type="submit" class="nouveau-btn w-full py-2.5 text-sm" style="background:var(--primary);color:#FAF6EE;">Entrar al almanaque</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="max-w-[1720px] mx-auto relative z-10 space-y-5">
+
+        <!-- =================================================================
+             1. PORTADA EDITORIAL ART NOUVEAU + SELECTOR DE TEORÍA DEL COLOR
+        ================================================================== -->
+        <header class="nouveau-frame p-5 sm:p-6 overflow-hidden">
+            <!-- Filigranas SVG Art Nouveau en las 4 esquinas -->
+            <svg class="corner-ornament top-2 left-2" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M2 38 C2 16, 16 2, 38 2 M8 38 C8 20, 20 8, 38 8 M14 26 C14 18, 18 14, 26 14" />
+                <circle cx="10" cy="10" r="2.2" fill="currentColor" />
+            </svg>
+            <svg class="corner-ornament top-2 right-2 rotate-90" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M2 38 C2 16, 16 2, 38 2 M8 38 C8 20, 20 8, 38 8 M14 26 C14 18, 18 14, 26 14" />
+                <circle cx="10" cy="10" r="2.2" fill="currentColor" />
+            </svg>
+            <svg class="corner-ornament bottom-2 left-2 -rotate-90" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M2 38 C2 16, 16 2, 38 2 M8 38 C8 20, 20 8, 38 8 M14 26 C14 18, 18 14, 26 14" />
+                <circle cx="10" cy="10" r="2.2" fill="currentColor" />
+            </svg>
+            <svg class="corner-ornament bottom-2 right-2 rotate-180" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M2 38 C2 16, 16 2, 38 2 M8 38 C8 20, 20 8, 38 8 M14 26 C14 18, 18 14, 26 14" />
+                <circle cx="10" cy="10" r="2.2" fill="currentColor" />
+            </svg>
+
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 px-2 sm:px-4">
+                <!-- Bloque Izquierdo: Título de Almanaque y Navegación Semanal -->
+                <div class="space-y-3 flex-1">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span style="background-color: var(--primary); color: #FAF6EE;" class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border border-current">
+                            ❧ Almanaque Semanal Ilustrado
+                        </span>
+                        <span id="weekDatesLabel" style="background-color: var(--secondary-soft); color: var(--secondary); border-color: var(--secondary);" class="px-3 py-1 rounded-full text-xs font-bold border">
+                            Cargando semana...
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <!-- Medallón botánico SVG -->
+                        <div style="background-color: var(--primary-soft); color: var(--accent-gold); border-color: var(--border-ornament);" class="w-11 h-11 rounded-full border-2 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                                <path d="M12 21V11M12 11C12 7 8 4 4 4C4 8 7 11 12 11ZM12 11C12 7 16 4 20 4C20 8 17 11 12 11ZM12 15C9 15 6 13 5 11M12 15C15 15 18 13 19 11" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            id="plannerTitleInput"
+                            aria-label="Título del organizador semanal"
+                            value="Grimorio Nocturno de Ritmo, Estudio & Creación"
+                            class="font-nouveau text-2xl sm:text-3xl lg:text-4xl font-bold bg-transparent hover:bg-white/5 focus:bg-black/35 px-2.5 py-1 rounded-lg border border-transparent focus:border-current outline-none w-full max-w-2xl"
+                        />
+                    </div>
+
+                    <!-- Controles de Navegación Temporal -->
+                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                        <button onclick="changeWeek(-1)" style="background-color: var(--card-elevated); color: var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span>←</span> Semana Anterior
+                        </button>
+                        <button onclick="changeWeek(0)" style="background-color: var(--primary); color: #FAF6EE;" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span>◈</span> Hoy
+                        </button>
+                        <button onclick="changeWeek(1)" style="background-color: var(--card-elevated); color: var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm flex items-center gap-1.5">
+                            Semana Siguiente <span>→</span>
+                        </button>
+                        <span class="opacity-30 mx-1 hidden sm:inline">|</span>
+                    </div>
+                </div>
+
+                <!-- Bloque Derecho: Selector Visual de Teoría del Color + Progreso -->
+                <div class="flex flex-col gap-3.5 xl:items-end">
+                    <!-- Selector con Diagrama de Círculo Cromático -->
+                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="p-3 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center gap-3.5">
+                        <!-- Mini Diagrama SVG del Círculo Cromático -->
+                        <div class="flex items-center gap-2.5">
+                            <svg id="colorWheelSvg" class="w-12 h-12 flex-shrink-0" viewBox="0 0 60 60">
+                                <!-- Anillo cromático sutil -->
+                                <circle cx="30" cy="30" r="24" fill="none" stroke="var(--border-ornament)" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
+                                <circle cx="30" cy="30" r="16" fill="none" stroke="var(--border-ornament)" stroke-width="0.8" opacity="0.35"/>
+                                <!-- Líneas geométricas dinámicas de armonía -->
+                                <g id="wheelHarmonyLines" stroke="var(--accent-gold)" stroke-width="1.8" fill="none"></g>
+                                <!-- Nodos de color activos -->
+                                <g id="wheelHarmonyNodes"></g>
+                            </svg>
+                            <div>
+                                <div class="text-[10px] font-bold uppercase tracking-wider opacity-70">Teoría del Color</div>
+                                <div id="harmonyDescription" class="font-nouveau text-xs font-bold">Complementarios (180°)</div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de los 3 Temas -->
+                        <div class="flex flex-wrap gap-1.5">
+                            <button
+                                onclick="setColorTheme('complementarios')"
+                                id="btn-theme-complementarios"
+                                class="nouveau-btn px-2.5 py-1.5 text-xs flex items-center gap-1.5"
+                            >
+                                <span class="inline-flex -space-x-1">
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#3B6FA6;"></span>
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#C86A47;"></span>
+                                </span>
+                                <span>Complementarios</span>
+                            </button>
+
+                            <button
+                                onclick="setColorTheme('triada')"
+                                id="btn-theme-triada"
+                                class="nouveau-btn px-2.5 py-1.5 text-xs flex items-center gap-1.5"
+                            >
+                                <span class="inline-flex -space-x-1">
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#4A8B74;"></span>
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#9B5684;"></span>
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#D69E42;"></span>
+                                </span>
+                                <span>Tríada</span>
+                            </button>
+
+                            <button
+                                onclick="setColorTheme('analogos')"
+                                id="btn-theme-analogos"
+                                class="nouveau-btn px-2.5 py-1.5 text-xs flex items-center gap-1.5"
+                            >
+                                <span class="inline-flex -space-x-1">
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#438A74;"></span>
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#397E91;"></span>
+                                    <span class="w-3 h-3 rounded-full border border-white/70" style="background:#B5A34C;"></span>
+                                </span>
+                                <span>Análogos</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Medidor General de Avance Semanal -->
+                    <div style="background-color: var(--card-elevated); border-color: var(--border-ornament);" class="px-3.5 py-2.5 rounded-xl border w-full xl:w-96">
+                        <div class="flex justify-between items-center text-xs font-bold mb-1.5">
+                            <span class="opacity-80">Progreso de la Semana</span>
+                            <span id="globalProgressText" style="color: var(--accent-gold);" class="font-extrabold">0% (0/0)</span>
+                        </div>
+                        <div style="background-color: var(--bg-paper-deep);" class="w-full h-2.5 rounded-full overflow-hidden border border-white/10">
+                            <div id="globalProgressBar" style="width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent-gold));" class="h-full rounded-full transition-all duration-500"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- =================================================================
+             2. TOP 3 PRIORIDADES (DESPLAZAMIENTO HORIZONTAL CONDICIONAL)
+        ================================================================== -->
+        <section class="nouveau-frame p-4 sm:p-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5">
+                <div class="flex items-center gap-2.5">
+                    <span style="background-color: var(--secondary); color: #FAF6EE; border-color: var(--accent-gold);" class="w-8 h-8 rounded-full border flex items-center justify-center font-nouveau font-bold text-sm">
+                        ❖
+                    </span>
+                    <div>
+                        <h2 class="font-nouveau text-xl sm:text-2xl font-bold leading-none">Top 3 Prioridades de la Semana</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div id="topPrioritiesGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+                <!-- Medallas I, II, III generadas por JS -->
+            </div>
+        </section>
+
+        <!-- =================================================================
+             3. AGENDA HORARIA DIARIA (06:30 A 23:00) — COLUMNAS DESLIZABLES
+        ================================================================== -->
+        <section aria-label="Agenda horaria semanal">
+            <!-- Barra superior con controles para deslizar columnas izquierda/derecha o enfocar un día -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3 px-1">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda Horaria (06:30 — 23:00)</h2>
+                </div>
+
+                <!-- Selector rápido para centrar un día en el carril o mostrar todas las columnas -->
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs font-semibold opacity-75 mr-1">Ir a día:</span>
+                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="nouveau-btn px-2.5 py-1 text-xs">
+                        Todos (7)
+                    </button>
+                    <div id="dayQuickJumpButtons" class="flex flex-wrap gap-1"></div>
+                </div>
+            </div>
+
+            <!-- Vista semanal o día individual -->
+            <div id="weekDaysContainer" class="overflow-x-auto pb-3">
+                <div id="weekDaysGrid" class="flex flex-row gap-4 w-max">
+                    <!-- Las 7 columnas con franjas de 06:30 a 23:00 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             4. TRACKER DE HÁBITOS BOTÁNICOS & TARJETAS DE ARCHIVO / EX-LIBRIS
+        ================================================================== -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-1">
+            <!-- Tracker de Hábitos Semanales (7 columnas) -->
+            <div class="lg:col-span-7 nouveau-frame p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span style="background-color: var(--primary); color: #FAF6EE;" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">✦</span>
+                        <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Rituales & Hábitos Semanales</h2>
+                    </div>
+                    <span id="habitsCounterBadge" style="background-color: var(--primary-soft); color: var(--accent-gold);" class="text-xs font-bold px-3 py-1 rounded-full border border-current/25">
+                        0/0 marcados
+                    </span>
+                </div>
+
+                <form onsubmit="addHabit(event)" class="flex gap-2 mb-4">
+                    <input
+                        type="text"
+                        id="newHabitInput"
+                        maxlength="38"
+                        placeholder="Nuevo hábito (ej: 🌿 Lectura nocturna 20 min)..."
+                        style="background-color: var(--card-elevated); border-color: var(--border-ornament); color: var(--ink-dark);"
+                        class="flex-1 px-3.5 py-2 rounded-lg border text-sm font-medium focus:outline-none focus:bg-black/30"
+                    />
+                    <button type="submit" style="background-color: var(--primary); color: #FAF6EE;" class="nouveau-btn px-4 py-2 text-xs sm:text-sm">
+                        + Añadir
+                    </button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr style="border-color: var(--border-ornament);" class="text-xs font-bold uppercase tracking-wider border-b">
+                                <th class="pb-2.5">Hábito</th>
+                                <th class="pb-2.5 text-center">L</th>
+                                <th class="pb-2.5 text-center">M</th>
+                                <th class="pb-2.5 text-center">X</th>
+                                <th class="pb-2.5 text-center">J</th>
+                                <th class="pb-2.5 text-center">V</th>
+                                <th class="pb-2.5 text-center">S</th>
+                                <th class="pb-2.5 text-center">D</th>
+                                <th class="pb-2.5"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="habitsTableBody" class="divide-y divide-white/10">
+                            <!-- Filas generadas dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Archivo / Ex-Libris (5 columnas) -->
+            <div class="lg:col-span-5 nouveau-frame p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span style="background-color: var(--secondary); color: #FAF6EE;" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">❧</span>
+                            <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Notas</h2>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 mb-4">
+                        <button type="button" id="notesTabBtn" onclick="switchNotesTasksTab('notes')" class="nouveau-btn px-3 py-1.5 text-xs" style="background:var(--primary);color:#FAF6EE;">Notas</button>
+                        <button type="button" id="tasksTabBtn" onclick="switchNotesTasksTab('tasks')" class="nouveau-btn px-3 py-1.5 text-xs" style="background:var(--card-elevated);color:var(--ink-dark);">Tareas</button>
+                    </div>
+                    <div id="notesPanel">
+                    <form onsubmit="addExLibrisNote(event)" class="flex gap-2 mb-4">
+                        <input
+                            type="text"
+                            id="newNoteInput"
+                            placeholder="Anotar idea, cita o recordatorio..."
+                            style="background-color: var(--card-elevated); border-color: var(--border-ornament); color: var(--ink-dark);"
+                            class="flex-1 px-3.5 py-2 rounded-lg border text-sm font-medium focus:outline-none focus:bg-black/30"
+                        />
+                        <button type="submit" style="background-color: var(--secondary); color: #FAF6EE;" class="nouveau-btn px-4 py-2 text-xs sm:text-sm">
+                            Archivar
+                        </button>
+                    </form>
+
+                    <div id="exLibrisGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1">
+                        <!-- Notas -->
+                    </div>
+                    </div>
+                    <div id="tasksPanel" class="hidden">
+                        <form onsubmit="addPersonalTask(event)" class="flex gap-2 mb-4">
+                            <input id="newPersonalTaskInput" type="text" maxlength="120" required placeholder="Nueva tarea para resolver..." style="background-color:var(--card-elevated);border-color:var(--border-ornament);color:var(--ink-dark);" class="flex-1 min-w-0 px-3 py-2 rounded-lg border text-sm">
+                            <button type="submit" style="background-color:var(--secondary);color:#FAF6EE;" class="nouveau-btn px-4 py-2 text-xs">Añadir</button>
+                        </form>
+                        <div id="personalTasksList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- =================================================================
+         MODAL RÁPIDO DE EDICIÓN DE HORARIO (PARA EDITAR O AGENDAR CON DETALLE)
+    ================================================================== -->
+    <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="nouveau-frame max-w-md w-full p-5 sm:p-6 relative">
+            <button onclick="closeScheduleModal()" style="border-color: var(--border-ornament);" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:bg-white/10 absolute top-4 right-4">
+                ✕
+            </button>
+            <h3 id="modalTitle" class="font-nouveau text-2xl font-bold">Agendar Actividad</h3>
+            <p id="modalSubtitle" class="text-xs font-semibold opacity-75 mb-4">Día y franja horaria</p>
+
+            <form onsubmit="submitScheduleModal(event)" class="space-y-4">
+                <input type="hidden" id="modalDayIndex" />
+                <input type="hidden" id="modalTaskId" />
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1">Horario</label>
+                        <select id="modalHourSelect" style="background-color: var(--card-elevated); border-color: var(--border-ornament); color: var(--ink-dark);" class="w-full px-2.5 py-2 rounded-lg border text-sm font-bold">
+                            <!-- Opciones 06:30 a 23:00 -->
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider mb-1">Descripción</label>
+                        <input
+                            type="text"
+                            id="modalTaskText"
+                            required
+                            placeholder="Ej: Lectura de ensayo..."
+                            style="background-color: var(--card-elevated); border-color: var(--border-ornament); color: var(--ink-dark);"
+                            class="w-full px-3 py-2 rounded-lg border text-sm font-medium focus:bg-black/35 focus:outline-none"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5">Categoría</label>
+                    <div id="modalCategorySelector" class="grid grid-cols-3 gap-2"></div>
+                    <input type="hidden" id="modalCategoryValue" value="trabajo" />
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeScheduleModal()" style="background-color: var(--card-elevated);" class="nouveau-btn px-4 py-2 text-xs">
+                        Cancelar
+                    </button>
+                    <button type="submit" style="background-color: var(--primary); color: #FAF6EE;" class="nouveau-btn px-5 py-2 text-xs">
+                        Guardar en Agenda
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificación discreta estilo sello editorial -->
+    <div id="statusToast" class="fixed bottom-5 right-5 z-50 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div style="background-color: var(--card-elevated); color: var(--ink-dark); border-color: var(--accent-gold);" class="px-4 py-2.5 rounded-xl border-2 shadow-xl text-xs font-bold flex items-center gap-2">
+            <span style="color: var(--accent-gold);">❧</span>
+            <span id="statusToastMessage">Guardado</span>
+        </div>
+    </div>
+
+    <script>
+        /* =====================================================================
+           CONSTANTES, TEORÍA DEL COLOR Y CONFIGURACIÓN DE HORARIOS (06:30 - 23:00)
+        ===================================================================== */
+        const DAYS_CONFIG = [
+            { name: 'Lunes',     short: 'Lun', roman: 'I' },
+            { name: 'Martes',    short: 'Mar', roman: 'II' },
+            { name: 'Miércoles', short: 'Mié', roman: 'III' },
+            { name: 'Jueves',    short: 'Jue', roman: 'IV' },
+            { name: 'Viernes',   short: 'Vie', roman: 'V' },
+            { name: 'Sábado',    short: 'Sáb', roman: 'VI' },
+            { name: 'Domingo',   short: 'Dom', roman: 'VII' }
+        ];
+
+        // Categorías con paletas oscuras profundas y contrastadas para modo nocturno
+        const CATEGORIES = {
+            trabajo:     { label: 'Trabajo',     color: '#6BA2DC', bg: 'rgba(59, 111, 166, 0.24)', icon: '✒' },
+            estudio:     { label: 'Estudio',     color: '#C782B0', bg: 'rgba(155, 86, 132, 0.24)', icon: '📖' },
+            bienestar:   { label: 'Bienestar',   color: '#6CC2A4', bg: 'rgba(74, 139, 116, 0.24)', icon: '🌿' },
+            creatividad: { label: 'Creatividad', color: '#E38A68', bg: 'rgba(200, 106, 71, 0.24)', icon: '🎨' },
+            personal:    { label: 'Personal',    color: '#E3B962', bg: 'rgba(212, 163, 73, 0.22)', icon: '🕯' }
+        };
+
+        // Configuración geométrica del diagrama SVG del círculo cromático para cada tema
+        const COLOR_THEORY_META = {
+            complementarios: {
+                title: 'Complementarios (180°)',
+                lines: '<line x1="14" y1="14" x2="46" y2="46" />',
+                nodes: [
+                    { cx: 14, cy: 14, fill: '#3B6FA6' },
+                    { cx: 46, cy: 46, fill: '#C86A47' }
+                ]
+            },
+            triada: {
+                title: 'Tríada Armónica (120°)',
+                lines: '<polygon points="30,7 50,42 10,42" />',
+                nodes: [
+                    { cx: 30, cy: 7,  fill: '#4A8B74' },
+                    { cx: 50, cy: 42, fill: '#9B5684' },
+                    { cx: 10, cy: 42, fill: '#D69E42' }
+                ]
+            },
+            analogos: {
+                title: 'Análogos Botánicos (30°)',
+                lines: '<path d="M 14 16 Q 30 6 46 16" />',
+                nodes: [
+                    { cx: 14, cy: 16, fill: '#438A74' },
+                    { cx: 30, cy: 8,  fill: '#397E91' },
+                    { cx: 46, cy: 16, fill: '#B5A34C' }
+                ]
+            }
+        };
+
+        // Generación exacta de horarios desde 06:30 hasta 23:00 en intervalos de 30 minutos
+        const TIME_SLOTS = [];
+        for (let hour = 6; hour <= 23; hour++) {
+            for (const minute of [0, 30]) {
+                if (hour === 6 && minute === 0) continue;   // Inicia a las 06:30
+                if (hour === 23 && minute === 30) continue; // Termina a las 23:00
+                TIME_SLOTS.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+            }
+        }
+
+        const STORAGE_KEY = 'art_nouveau_nocturnal_almanac_v1';
+        const SUPABASE_URL = 'https://aotrokqufdymfwkqdlmc.supabase.co';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_V0cPlpDFML4n0go3qjKMwQ_Ssvjs3fP';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        let currentUser = null;
+        let cloudReady = false;
+        let cloudSaveTimer = null;
+        let activeNotesTasksTab = 'notes';
+        let weekOffset = 0;
+        let focusedDayIndex = null; // null = mostrar los 7 días en columnas deslizables; 0..6 = centrar un día
+        let inlineEditorState = null; // { dayIdx, hour } para edición directa en la fila horaria
+        let lastShimmeryTaskId = null;
+
+        let appState = {
+            theme: 'complementarios',
+            weeks: {}
+        };
+
+        /* =====================================================================
+           GESTIÓN DE FECHAS Y DATOS INICIALES ENRIQUECIDOS
+        ===================================================================== */
+        function getMondayISO(offset = 0) {
+            const now = new Date();
+            const day = now.getDay();
+            const diffToMonday = (day === 0 ? -6 : 1) - day + (offset * 7);
+            const monday = new Date(now);
+            monday.setDate(now.getDate() + diffToMonday);
+            monday.setHours(0, 0, 0, 0);
+            return monday.toISOString().split('T')[0];
+        }
+
+        function formatWeekSpan(mondayISO) {
+            const start = new Date(mondayISO + 'T00:00:00');
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            return `${start.getDate()} de ${months[start.getMonth()]} — ${end.getDate()} de ${months[end.getMonth()]} ${end.getFullYear()}`;
+        }
+
+        function getDayNumber(mondayISO, dayIdx) {
+            const d = new Date(mondayISO + 'T00:00:00');
+            d.setDate(d.getDate() + dayIdx);
+            return d.getDate();
+        }
+
+        function createDefaultWeekData() {
+            return {
+                title: 'Grimorio Nocturno de Ritmo, Estudio & Creación',
+                // Incluye una prioridad larga (I), una media/larga (II) y una corta (III) sin scroll
+                priorities: [
+                    {
+                        text: 'Concluir el cuaderno botánico nocturno revisando márgenes dorados, tipografía serif y armonías cromáticas antes del viernes',
+                        done: true
+                    },
+                    {
+                        text: 'Estudiar arquitectura y composición visual',
+                        done: false
+                    },
+                    {
+                        text: 'Paseo nocturno breve',
+                        done: false
+                    }
+                ],
+                // Actividades distribuidas en horarios reales entre 06:30 y 23:00
+                tasks: [
+                    // Lunes
+                    [
+                        { id: 't101', hour: '07:00', text: 'Infusión herbal y estiramientos matutinos', category: 'bienestar', done: true },
+                        { id: 't102', hour: '09:30', text: 'Planificación estratégica de proyectos', category: 'trabajo', done: true },
+                        { id: 't103', hour: '18:30', text: 'Lectura de historia del arte y apuntes', category: 'estudio', done: false }
+                    ],
+                    // Martes
+                    [
+                        { id: 't201', hour: '08:00', text: 'Bocetos e ilustración de láminas', category: 'creatividad', done: true },
+                        { id: 't202', hour: '14:00', text: 'Revisión de entregables con el equipo', category: 'trabajo', done: false },
+                        { id: 't203', hour: '20:00', text: 'Cena tranquila y música instrumental', category: 'personal', done: false }
+                    ],
+                    // Miércoles
+                    [
+                        { id: 't301', hour: '06:30', text: 'Caminata al amanecer por el parque', category: 'bienestar', done: true },
+                        { id: 't302', hour: '11:00', text: 'Seminario de investigación editorial', category: 'estudio', done: false },
+                        { id: 't303', hour: '17:30', text: 'Taller de encuadernación artesanal', category: 'creatividad', done: false }
+                    ],
+                    // Jueves
+                    [
+                        { id: 't401', hour: '09:00', text: 'Redacción de informe y síntesis', category: 'trabajo', done: false },
+                        { id: 't402', hour: '15:30', text: 'Café y conversación con mentores', category: 'personal', done: false }
+                    ],
+                    // Viernes
+                    [
+                        { id: 't501', hour: '07:30', text: 'Práctica de respiración y movilidad', category: 'bienestar', done: false },
+                        { id: 't502', hour: '10:30', text: 'Cierre semanal y archivo de avances', category: 'trabajo', done: false },
+                        { id: 't503', hour: '21:00', text: 'Velada de cine clásico en casa', category: 'personal', done: false }
+                    ],
+                    // Sábado
+                    [
+                        { id: 't601', hour: '09:30', text: 'Visita a librería y feria de anticuarios', category: 'creatividad', done: false },
+                        { id: 't602', hour: '16:00', text: 'Acuarela botánica en el jardín', category: 'creatividad', done: false }
+                    ],
+                    // Domingo
+                    [
+                        { id: 't701', hour: '10:00', text: 'Preparación de menú saludable semanal', category: 'bienestar', done: false },
+                        { id: 't702', hour: '19:00', text: 'Ordenar escritorio y preparar lunes', category: 'personal', done: false }
+                    ]
+                ],
+                habits: [
+                    { id: 'h1', name: '🌿 Caminata matutina 30m', days: [true, true, true, false, false, false, false] },
+                    { id: 'h2', name: '📖 Lectura sin pantallas', days: [true, false, true, true, false, false, false] },
+                    { id: 'h3', name: '💧 Hidratación consciente', days: [true, true, true, true, false, false, false] },
+                    { id: 'h4', name: '🕯 Descanso antes de 23:00', days: [false, true, true, false, false, false, false] }
+                ],
+                checklist: [],
+                notes: [
+                    { id: 'n1', code: 'EX-01', text: 'Conseguir papel algodón de 200g y pluma estilográfica de punto fino.' },
+                    { id: 'n2', code: 'EX-02', text: 'Revisar paleta de pigmentos minerales para la portada del próximo mes.' },
+                    { id: 'n3', code: 'EX-03', text: 'Recordar confirmar la reserva del jueves a las 15:30.' }
+                ]
+            };
+        }
+
+        function initializePlanner() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    appState = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.warn('Error leyendo almacenamiento local:', e);
+            }
+
+            const mondayKey = getMondayISO(weekOffset);
+            if (!appState.weeks[mondayKey]) {
+                appState.weeks[mondayKey] = createDefaultWeekData();
+                saveState(false);
+            }
+            Object.values(appState.weeks).forEach(w => { if (!Array.isArray(w.checklist)) w.checklist = []; });
+
+            if (!COLOR_THEORY_META[appState.theme]) {
+                appState.theme = 'complementarios';
+            }
+
+            setColorTheme(appState.theme, false);
+            renderAll();
+        }
+
+        function saveState(showFeedback = true) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                if (cloudReady && currentUser) {
+                    clearTimeout(cloudSaveTimer);
+                    cloudSaveTimer = setTimeout(saveToCloud, 650);
+                }
+                if (showFeedback) triggerToast('Cambios guardados en el grimorio');
+            } catch (e) {
+                console.warn('Error guardando estado:', e);
+            }
+        }
+
+        function getActiveWeek() {
+            const key = getMondayISO(weekOffset);
+            if (!appState.weeks[key]) {
+                appState.weeks[key] = createDefaultWeekData();
+            }
+            return appState.weeks[key];
+        }
+
+        /* =====================================================================
+           SELECTOR DE TEORÍA DEL COLOR Y ACTUALIZACIÓN DE CÍRCULO CROMÁTICO
+        ===================================================================== */
+        function setColorTheme(themeKey, notify = true) {
+            appState.theme = themeKey;
+            document.body.setAttribute('data-theme', themeKey);
+
+            // Actualizar diagrama SVG del círculo cromático
+            const theory = COLOR_THEORY_META[themeKey];
+            if (theory) {
+                document.getElementById('harmonyDescription').textContent = theory.title;
+                document.getElementById('wheelHarmonyLines').innerHTML = theory.lines;
+                document.getElementById('wheelHarmonyNodes').innerHTML = theory.nodes
+                    .map(n => `<circle cx="${n.cx}" cy="${n.cy}" r="4.5" fill="${n.fill}" stroke="#F8F3E8" stroke-width="1.4" />`)
+                    .join('');
+            }
+
+            // Actualizar estado visual de los botones de tema
+            Object.keys(COLOR_THEORY_META).forEach(key => {
+                const btn = document.getElementById(`btn-theme-${key}`);
+                if (!btn) return;
+                if (key === themeKey) {
+                    btn.style.backgroundColor = 'var(--primary)';
+                    btn.style.color = '#FAF6EE';
+                } else {
+                    btn.style.backgroundColor = 'var(--card-bg)';
+                    btn.style.color = 'var(--ink-dark)';
+                }
+            });
+
+            saveState(false);
+            if (notify) {
+                triggerToast(`Armonía aplicada: ${theory.title}`);
+            }
+        }
+
+        function changeWeek(delta) {
+            weekOffset = delta === 0 ? 0 : weekOffset + delta;
+            inlineEditorState = null;
+            renderAll();
+            triggerToast(delta === 0 ? 'Semana actual' : 'Semana actualizada');
+        }
+
+        function restoreSampleData() {
+            const key = getMondayISO(weekOffset);
+            appState.weeks[key] = createDefaultWeekData();
+            inlineEditorState = null;
+            saveState(false);
+            renderAll();
+            triggerToast('Datos de muestra restaurados');
+        }
+
+        /* =====================================================================
+           RENDERIZADO INTEGRAL
+        ===================================================================== */
+        function renderAll() {
+            const mondayISO = getMondayISO(weekOffset);
+            const weekData = getActiveWeek();
+
+            document.getElementById('weekDatesLabel').textContent = `📅 ${formatWeekSpan(mondayISO)}`;
+            document.getElementById('plannerTitleInput').value = weekData.title;
+
+            renderTopPriorities(weekData);
+            renderQuickDayFilters();
+            renderWeeklySchedule(mondayISO, weekData);
+            renderHabitsSection(weekData);
+            renderExLibrisNotes(weekData);
+            renderPersonalTasks(weekData);
+            updateGlobalProgress(weekData);
+        }
+
+        document.getElementById('plannerTitleInput').addEventListener('input', (e) => {
+            getActiveWeek().title = e.target.value;
+            saveState(false);
+        });
+
+        /* =====================================================================
+           TOP 3 PRIORIDADES: DESPLAZAMIENTO HORIZONTAL SOLO SI EL TEXTO ES LARGO
+        ===================================================================== */
+        function renderTopPriorities(weekData) {
+            const container = document.getElementById('topPrioritiesGrid');
+            container.innerHTML = '';
+            const numerals = ['I', 'II', 'III'];
+
+            weekData.priorities.forEach((prio, idx) => {
+                const card = document.createElement('div');
+                card.style.backgroundColor = 'var(--card-elevated)';
+                card.style.borderColor = 'var(--border-ornament)';
+                card.className = 'p-3 rounded-xl border flex items-center gap-2.5';
+
+                card.innerHTML = `
+                    <!-- Medalla estilo grabado nocturno -->
+                    <div style="background-color: ${idx === 1 ? 'var(--secondary)' : 'var(--primary)'}; color: #FAF6EE; border-color: var(--accent-gold);" class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-nouveau font-bold text-xs flex-shrink-0 shadow-xs">
+                        ${numerals[idx]}
+                    </div>
+
+                    <!-- Checkbox de cumplimiento -->
+                    <button
+                        type="button"
+                        onclick="togglePriorityStatus(${idx})"
+                        title="Marcar prioridad como cumplida"
+                        style="border-color: var(--border-ornament); background-color: ${prio.done ? 'var(--primary)' : 'var(--bg-paper-deep)'}; color: #FAF6EE;"
+                        class="w-5 h-5 rounded border flex items-center justify-center text-xs font-bold flex-shrink-0 cursor-pointer"
+                    >
+                        ${prio.done ? '✓' : ''}
+                    </button>
+
+                    <!-- Viewport de una sola línea: se evalúa dinámicamente si hay desbordamiento horizontal -->
+                    <div id="priority-viewport-${idx}" class="flex-1 min-w-0 priority-scroll-viewport">
+                        <input
+                            id="priority-input-${idx}"
+                            type="text"
+                            value="${escapeHtml(prio.text)}"
+                            placeholder="Escribe prioridad ${numerals[idx]}..."
+                            oninput="evaluatePriorityOverflow(${idx}, this); updatePriorityText(${idx}, this.value, false)"
+                            onchange="updatePriorityText(${idx}, this.value, true)"
+                            style="color: var(--ink-dark);"
+                            class="bg-transparent text-xs sm:text-sm font-semibold whitespace-nowrap focus:outline-none focus:bg-black/30 px-1.5 py-0.5 rounded w-full ${prio.done ? 'line-through opacity-60' : ''}"
+                        />
+                    </div>
+
+                    <!-- Botón para deslizar a la derecha: solo visible si la frase excede el ancho disponible -->
+                    <button
+                        id="priority-scroll-btn-${idx}"
+                        type="button"
+                        onclick="nudgePriorityScroll(${idx})"
+                        title="Deslizar texto hacia la derecha"
+                        style="background-color: var(--card-bg); border-color: var(--border-ornament); color: var(--accent-gold);"
+                        class="hidden px-2 py-1 rounded-md border text-xs font-bold flex-shrink-0 hover:opacity-85 cursor-pointer"
+                    >
+                        →
+                    </button>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Evaluar tras montar en el DOM si cada frase supera el ancho visible
+            requestAnimationFrame(() => {
+                weekData.priorities.forEach((_, idx) => {
+                    const inputEl = document.getElementById(`priority-input-${idx}`);
+                    if (inputEl) evaluatePriorityOverflow(idx, inputEl);
+                });
+            });
+        }
+
+        // Mide el ancho real del texto frente al ancho del contenedor para activar/ocultar el scroll horizontal
+        function evaluatePriorityOverflow(idx, inputEl) {
+            const viewport = document.getElementById(`priority-viewport-${idx}`);
+            const scrollBtn = document.getElementById(`priority-scroll-btn-${idx}`);
+            if (!viewport || !inputEl) return;
+
+            const spanProbe = document.createElement('span');
+            const computed = window.getComputedStyle(inputEl);
+            spanProbe.style.position = 'fixed';
+            spanProbe.style.visibility = 'hidden';
+            spanProbe.style.pointerEvents = 'none';
+            spanProbe.style.whiteSpace = 'pre';
+            spanProbe.style.fontFamily = computed.fontFamily;
+            spanProbe.style.fontSize = computed.fontSize;
+            spanProbe.style.fontWeight = computed.fontWeight;
+            spanProbe.style.letterSpacing = computed.letterSpacing;
+            spanProbe.textContent = inputEl.value || inputEl.placeholder || '';
+
+            document.body.appendChild(spanProbe);
+            const textWidth = spanProbe.getBoundingClientRect().width + 16;
+            document.body.removeChild(spanProbe);
+
+            const availableWidth = viewport.clientWidth;
+            const overflows = textWidth > availableWidth + 2;
+
+            if (overflows) {
+                inputEl.style.width = `${Math.ceil(textWidth)}px`;
+                viewport.classList.add('has-overflow');
+                if (scrollBtn) scrollBtn.classList.remove('hidden');
+            } else {
+                inputEl.style.width = '100%';
+                viewport.scrollLeft = 0;
+                viewport.classList.remove('has-overflow');
+                if (scrollBtn) scrollBtn.classList.add('hidden');
+            }
+        }
+
+        function nudgePriorityScroll(idx) {
+            const viewport = document.getElementById(`priority-viewport-${idx}`);
+            if (!viewport || !viewport.classList.contains('has-overflow')) return;
+            if (viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 5) {
+                viewport.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                viewport.scrollBy({ left: 180, behavior: 'smooth' });
+            }
+        }
+
+        function updatePriorityText(idx, value, notify) {
+            getActiveWeek().priorities[idx].text = value;
+            saveState(notify);
+        }
+
+        function togglePriorityStatus(idx) {
+            const item = getActiveWeek().priorities[idx];
+            item.done = !item.done;
+            saveState(false);
+            renderTopPriorities(getActiveWeek());
+            if (item.done) triggerToast('Prioridad completada ✦');
+        }
+
+        /* =====================================================================
+           AGENDA HORARIA DIARIA (06:30 A 23:00) — COLUMNAS DESLIZABLES IZQ/DER
+        ===================================================================== */
+        function slideDaysTrack(direction) {
+            const container = document.getElementById('weekDaysContainer');
+            if (!container) return;
+            const step = Math.max(Math.round(container.clientWidth * 0.72), 320);
+            container.scrollBy({
+                left: direction * step,
+                behavior: 'smooth'
+            });
+        }
+
+        function renderQuickDayFilters() {
+            const container = document.getElementById('dayQuickJumpButtons');
+            container.innerHTML = '';
+
+            const allBtn = document.getElementById('focus-btn-all');
+            if (focusedDayIndex === null) {
+                allBtn.style.backgroundColor = 'var(--primary)';
+                allBtn.style.color = '#FAF6EE';
+            } else {
+                allBtn.style.backgroundColor = 'var(--card-elevated)';
+                allBtn.style.color = 'var(--ink-dark)';
+            }
+
+            DAYS_CONFIG.forEach((d, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = d.short;
+                btn.onclick = () => setFocusedDay(idx);
+                const isActive = focusedDayIndex === idx;
+                btn.style.backgroundColor = isActive ? 'var(--secondary)' : 'var(--card-elevated)';
+                btn.style.color = isActive ? '#FAF6EE' : 'var(--ink-dark)';
+                btn.className = 'nouveau-btn px-2.5 py-1 text-xs';
+                container.appendChild(btn);
+            });
+        }
+
+        function setFocusedDay(idx) {
+            focusedDayIndex = idx;
+            renderAll();
+            if (idx === null) {
+                const container = document.getElementById('weekDaysContainer');
+                if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
+            }
+        }
+
+        function scrollToDayColumn(dayIdx) {
+            if (focusedDayIndex !== null) {
+                focusedDayIndex = dayIdx;
+                renderAll();
+                return;
+            }
+            const colEl = document.getElementById(`day-col-${dayIdx}`);
+            const container = document.getElementById('weekDaysContainer');
+            if (colEl && container) {
+                container.scrollTo({
+                    left: Math.max(0, colEl.offsetLeft - container.offsetLeft - 8),
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function renderWeeklySchedule(mondayISO, weekData) {
+            const grid = document.getElementById('weekDaysGrid');
+            grid.innerHTML = '';
+
+            // Siempre en columnas lado a lado dentro del carril deslizable horizontal
+            if (focusedDayIndex !== null) {
+                grid.className = 'flex flex-row justify-center w-full';
+            } else {
+                grid.className = 'flex flex-row gap-4 w-max';
+            }
+
+            DAYS_CONFIG.forEach((dayMeta, dayIdx) => {
+                if (focusedDayIndex !== null && focusedDayIndex !== dayIdx) return;
+
+                const dayNum = getDayNumber(mondayISO, dayIdx);
+                const dayTasks = weekData.tasks[dayIdx] || [];
+                const completedCount = dayTasks.filter(t => t.done).length;
+                const dayPct = dayTasks.length ? Math.round((completedCount / dayTasks.length) * 100) : 0;
+
+                // Agrupar tareas por franja horaria
+                const tasksBySlot = {};
+                dayTasks.forEach(task => {
+                    const hr = task.hour || '09:00';
+                    if (!tasksBySlot[hr]) tasksBySlot[hr] = [];
+                    tasksBySlot[hr].push(task);
+                });
+
+                const card = document.createElement('article');
+                card.id = `day-col-${dayIdx}`;
+                const colWidthClass = focusedDayIndex !== null
+                    ? 'w-full max-w-none h-[calc(100vh-220px)] min-h-[520px]'
+                    : 'w-[78vw] sm:w-[310px] md:w-[295px] lg:w-[285px] h-[590px] flex-shrink-0';
+                card.className = `nouveau-frame flex flex-col overflow-hidden ${colWidthClass}`;
+
+                // Alternar tono de cabecera entre primario y secundario de la armonía elegida
+                const headerBg = dayIdx % 2 === 0 ? 'var(--primary)' : 'var(--secondary)';
+
+                let html = `
+                    <!-- Encabezado ilustrado nocturno del día -->
+                    <div style="background-color: ${headerBg}; color: #FAF6EE; border-color: var(--accent-gold);" class="p-3 border-b-2 flex-shrink-0">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-nouveau opacity-85 border border-white/40 rounded px-1.5 py-0.5">${dayMeta.roman}</span>
+                                <h3 class="font-nouveau text-lg font-bold tracking-wide">${dayMeta.name}</h3>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span style="background-color: var(--bg-paper-deep); color: var(--accent-gold);" class="text-xs font-extrabold px-2 py-0.5 rounded-full border border-white/20">
+                                    ${dayNum}
+                                </span>
+                                <button
+                                    type="button"
+                                    onclick="openScheduleModal(${dayIdx}, '09:00')"
+                                    title="Agendar en ${dayMeta.name}"
+                                    class="bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-2 py-0.5 rounded border border-white/40 cursor-pointer"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mini barra de progreso diario -->
+                        <div class="mt-2 flex items-center gap-2">
+                            <div class="flex-1 h-1.5 bg-black/35 rounded-full overflow-hidden">
+                                <div style="width: ${dayPct}%; background-color: var(--accent-gold);" class="h-full rounded-full transition-all duration-300"></div>
+                            </div>
+                            <span class="text-[10px] font-bold opacity-90">${completedCount}/${dayTasks.length}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Lista continua de todas las horas desde 06:30 hasta 23:00
+                html += `<div class="flex-1 overflow-y-auto timeline-scroll divide-y divide-white/10">`;
+
+                TIME_SLOTS.forEach(slotHour => {
+                    const slotItems = tasksBySlot[slotHour] || [];
+                    const isTopOfHour = slotHour.endsWith(':00');
+                    const isInlineOpen = inlineEditorState && inlineEditorState.dayIdx === dayIdx && inlineEditorState.hour === slotHour;
+
+                    if (isInlineOpen) {
+                        // Formulario inline directamente dentro de la franja horaria seleccionada
+                        html += `
+                            <div style="background-color: var(--primary-soft);" class="p-2.5 space-y-2 border-l-4 border-current">
+                                <div class="flex items-center justify-between">
+                                    <span style="color: var(--accent-gold);" class="text-xs font-extrabold">🕰 ${slotHour} — Nueva actividad</span>
+                                    <button type="button" onclick="closeInlineEditor()" class="text-xs font-bold opacity-70 hover:opacity-100">✕</button>
+                                </div>
+                                <form onsubmit="saveInlineTask(event, ${dayIdx}, '${slotHour}')" class="space-y-2">
+                                    <input
+                                        type="text"
+                                        id="inlineTaskInput"
+                                        required
+                                        placeholder="Escribe y pulsa Enter..."
+                                        style="background-color: var(--bg-paper-deep); color: var(--ink-dark);"
+                                        class="w-full px-2.5 py-1.5 rounded-lg border border-white/25 text-xs font-semibold focus:outline-none"
+                                    />
+                                    <div class="flex items-center justify-between gap-1.5">
+                                        <select id="inlineTaskCategory" style="background-color: var(--bg-paper-deep); color: var(--ink-dark);" class="px-2 py-1 rounded border border-white/25 text-[11px] font-bold">
+                                            <option value="trabajo">✒ Trabajo</option>
+                                            <option value="estudio">📖 Estudio</option>
+                                            <option value="bienestar">🌿 Bienestar</option>
+                                            <option value="creatividad">🎨 Creatividad</option>
+                                            <option value="personal">🕯 Personal</option>
+                                        </select>
+                                        <button type="submit" style="background-color: var(--primary); color: #FAF6EE;" class="px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer">
+                                            Guardar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        `;
+                    } else if (slotItems.length === 0) {
+                        // Franja libre clicable
+                        html += `
+                            <div
+                                onclick="openInlineEditor(${dayIdx}, '${slotHour}')"
+                                style="${isTopOfHour ? 'background-color: rgba(255,255,255,0.025);' : ''}"
+                                class="group flex items-center justify-between px-2.5 py-1.5 cursor-pointer hover:bg-white/5 transition-colors"
+                            >
+                                <span class="text-[11px] ${isTopOfHour ? 'font-bold opacity-85' : 'font-medium opacity-45'} w-11 flex-shrink-0">
+                                    ${slotHour}
+                                </span>
+                                <span style="color: var(--accent-gold);" class="text-[10px] font-bold opacity-0 group-hover:opacity-95 transition-opacity">
+                                    + Agendar
+                                </span>
+                            </div>
+                        `;
+                    } else {
+                        // Franja con actividades ilustradas
+                        html += `<div style="background-color: var(--card-elevated);" class="p-2 space-y-1.5">`;
+                        slotItems.forEach(task => {
+                            const cat = CATEGORIES[task.category] || CATEGORIES.trabajo;
+                            const shimmerClass = lastShimmeryTaskId === task.id ? 'shimmer-done' : '';
+                            html += `
+                                <div
+                                    style="border-left: 4px solid ${cat.color}; background-color: var(--card-bg);"
+                                    class="p-2 rounded-lg border border-white/10 shadow-xs ${shimmerClass} ${task.done ? 'opacity-70' : ''}"
+                                >
+                                    <div class="flex items-center justify-between gap-1 mb-1">
+                                        <span style="color: var(--accent-gold);" class="text-[11px] font-extrabold">${slotHour}</span>
+                                        <span style="background-color: ${cat.bg}; color: ${cat.color};" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                                            ${cat.icon} ${cat.label}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-start gap-1.5">
+                                        <button
+                                            type="button"
+                                            onclick="toggleTaskCompletion(${dayIdx}, '${task.id}')"
+                                            style="border-color: ${cat.color}; background-color: ${task.done ? cat.color : 'var(--bg-paper-deep)'}; color: #FFFFFF;"
+                                            class="mt-0.5 w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center text-[10px] font-bold cursor-pointer"
+                                        >
+                                            ${task.done ? '✓' : ''}
+                                        </button>
+                                        <p class="text-xs font-semibold leading-snug break-words flex-1 ${task.done ? 'line-through opacity-65' : ''}">
+                                            ${escapeHtml(task.text)}
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1.5 mt-1.5 pt-1 border-t border-white/10">
+                                        <button
+                                            type="button"
+                                            onclick="openInlineEditor(${dayIdx}, '${slotHour}')"
+                                            class="text-[10px] font-semibold opacity-65 hover:opacity-100"
+                                            title="Añadir otra en este horario"
+                                        >
+                                            + Otra
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onclick="openScheduleModal(${dayIdx}, '${slotHour}', '${task.id}')"
+                                            class="text-[10px] font-semibold opacity-65 hover:opacity-100"
+                                            title="Editar actividad"
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onclick="deleteTask(${dayIdx}, '${task.id}')"
+                                            class="text-[10px] font-bold text-rose-400 opacity-75 hover:opacity-100"
+                                            title="Eliminar"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+                });
+
+                html += `</div>`;
+                card.innerHTML = html;
+                grid.appendChild(card);
+            });
+
+            if (inlineEditorState) {
+                const inp = document.getElementById('inlineTaskInput');
+                if (inp) inp.focus();
+            }
+        }
+
+        function openInlineEditor(dayIdx, hour) {
+            inlineEditorState = { dayIdx, hour };
+            renderWeeklySchedule(getMondayISO(weekOffset), getActiveWeek());
+        }
+
+        function closeInlineEditor() {
+            inlineEditorState = null;
+            renderWeeklySchedule(getMondayISO(weekOffset), getActiveWeek());
+        }
+
+        function saveInlineTask(e, dayIdx, hour) {
+            e.preventDefault();
+            const textEl = document.getElementById('inlineTaskInput');
+            const catEl = document.getElementById('inlineTaskCategory');
+            const text = textEl.value.trim();
+            if (!text) return;
+
+            getActiveWeek().tasks[dayIdx].push({
+                id: 'tk_' + Date.now() + Math.random().toString(36).slice(2, 5),
+                hour,
+                text,
+                category: catEl.value || 'trabajo',
+                done: false
+            });
+
+            inlineEditorState = null;
+            saveState();
+            renderAll();
+        }
+
+        function toggleTaskCompletion(dayIdx, taskId) {
+            const task = getActiveWeek().tasks[dayIdx].find(t => t.id === taskId);
+            if (!task) return;
+            task.done = !task.done;
+            lastShimmeryTaskId = task.done ? task.id : null;
+            saveState(false);
+            renderAll();
+            if (task.done) {
+                triggerToast('Actividad completada ✦');
+            }
+        }
+
+        function deleteTask(dayIdx, taskId) {
+            const week = getActiveWeek();
+            week.tasks[dayIdx] = week.tasks[dayIdx].filter(t => t.id !== taskId);
+            saveState();
+            renderAll();
+        }
+
+        /* =====================================================================
+           MODAL DE EDICIÓN DE HORARIO / CATEGORÍA
+        ===================================================================== */
+        function openScheduleModal(dayIdx, defaultHour = '09:00', taskId = '') {
+            const week = getActiveWeek();
+            document.getElementById('modalDayIndex').value = dayIdx;
+            document.getElementById('modalTaskId').value = taskId;
+
+            const hourSelect = document.getElementById('modalHourSelect');
+            hourSelect.innerHTML = '';
+            TIME_SLOTS.forEach(slot => {
+                const opt = document.createElement('option');
+                opt.value = slot;
+                opt.textContent = slot;
+                if (slot === defaultHour) opt.selected = true;
+                hourSelect.appendChild(opt);
+            });
+
+            let selectedCat = 'trabajo';
+            if (taskId) {
+                const existing = week.tasks[dayIdx].find(t => t.id === taskId);
+                if (existing) {
+                    document.getElementById('modalTaskText').value = existing.text;
+                    hourSelect.value = existing.hour || defaultHour;
+                    selectedCat = existing.category || 'trabajo';
+                }
+                document.getElementById('modalTitle').textContent = 'Editar Actividad';
+            } else {
+                document.getElementById('modalTaskText').value = '';
+                document.getElementById('modalTitle').textContent = 'Agendar en Horario';
+            }
+
+            document.getElementById('modalSubtitle').textContent = `${DAYS_CONFIG[dayIdx].name} • Franja entre 06:30 y 23:00`;
+            renderModalCategories(selectedCat);
+
+            const modal = document.getElementById('scheduleModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('modalTaskText').focus(), 40);
+        }
+
+        function closeScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function renderModalCategories(activeKey) {
+            document.getElementById('modalCategoryValue').value = activeKey;
+            const container = document.getElementById('modalCategorySelector');
+            container.innerHTML = '';
+
+            Object.entries(CATEGORIES).forEach(([key, meta]) => {
+                const isSelected = key === activeKey;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.style.backgroundColor = meta.bg;
+                btn.style.color = meta.color;
+                btn.style.borderColor = isSelected ? meta.color : 'transparent';
+                btn.className = `py-1.5 px-2 rounded-lg border-2 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer ${isSelected ? 'scale-105 shadow-xs' : 'opacity-80 hover:opacity-100'}`;
+                btn.innerHTML = `<span>${meta.icon}</span><span>${meta.label}</span>`;
+                btn.onclick = () => renderModalCategories(key);
+                container.appendChild(btn);
+            });
+        }
+
+        function submitScheduleModal(e) {
+            e.preventDefault();
+            const dayIdx = parseInt(document.getElementById('modalDayIndex').value, 10);
+            const taskId = document.getElementById('modalTaskId').value;
+            const hour = document.getElementById('modalHourSelect').value;
+            const text = document.getElementById('modalTaskText').value.trim();
+            const category = document.getElementById('modalCategoryValue').value;
+
+            if (!text) return;
+
+            const week = getActiveWeek();
+            if (taskId) {
+                const target = week.tasks[dayIdx].find(t => t.id === taskId);
+                if (target) {
+                    target.hour = hour;
+                    target.text = text;
+                    target.category = category;
+                }
+            } else {
+                week.tasks[dayIdx].push({
+                    id: 'tk_' + Date.now() + Math.random().toString(36).slice(2, 5),
+                    hour,
+                    text,
+                    category,
+                    done: false
+                });
+            }
+
+            saveState();
+            closeScheduleModal();
+            renderAll();
+        }
+
+        function updateGlobalProgress(weekData) {
+            let total = 0;
+            let done = 0;
+            weekData.tasks.forEach(dayList => {
+                dayList.forEach(t => {
+                    total++;
+                    if (t.done) done++;
+                });
+            });
+            const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+            document.getElementById('globalProgressText').textContent = `${pct}% (${done}/${total})`;
+            document.getElementById('globalProgressBar').style.width = `${pct}%`;
+        }
+
+        /* =====================================================================
+           HÁBITOS SEMANALES & TARJETAS DE ARCHIVO / EX-LIBRIS
+        ===================================================================== */
+        function renderHabitsSection(weekData) {
+            const tbody = document.getElementById('habitsTableBody');
+            tbody.innerHTML = '';
+            let totalCells = 0;
+            let checkedCells = 0;
+
+            weekData.habits.forEach((habit, hIdx) => {
+                const tr = document.createElement('tr');
+                let rowHtml = `<td class="py-2.5 pr-3 text-xs sm:text-sm font-semibold whitespace-nowrap">${escapeHtml(habit.name)}</td>`;
+
+                habit.days.forEach((checked, dIdx) => {
+                    totalCells++;
+                    if (checked) checkedCells++;
+                    const activeColor = dIdx % 2 === 0 ? 'var(--primary)' : 'var(--secondary)';
+                    rowHtml += `
+                        <td class="py-2 text-center">
+                            <button
+                                type="button"
+                                onclick="toggleHabitDay(${hIdx}, ${dIdx}, event)"
+                                style="background-color: ${checked ? activeColor : 'var(--card-elevated)'}; color: ${checked ? '#FAF6EE' : 'transparent'}; border-color: var(--border-ornament);"
+                                class="w-6 h-6 rounded-full border inline-flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-110 transition-transform"
+                            >
+                                ✦
+                            </button>
+                        </td>
+                    `;
+                });
+
+                rowHtml += `
+                    <td class="py-2 text-right">
+                        <button type="button" onclick="removeHabit(${hIdx})" class="text-xs opacity-45 hover:opacity-100 px-1" title="Eliminar hábito">✕</button>
+                    </td>
+                `;
+
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('habitsCounterBadge').textContent = `${checkedCells}/${totalCells} marcados`;
+        }
+
+        function addHabit(e) {
+            e.preventDefault();
+            const inp = document.getElementById('newHabitInput');
+            const name = inp.value.trim();
+            if (!name) return;
+            getActiveWeek().habits.push({
+                id: 'hb_' + Date.now(),
+                name,
+                days: [false, false, false, false, false, false, false]
+            });
+            inp.value = '';
+            saveState();
+            renderHabitsSection(getActiveWeek());
+        }
+
+        function toggleHabitDay(hIdx, dIdx, clickEvent) {
+            const h = getActiveWeek().habits[hIdx];
+            h.days[dIdx] = !h.days[dIdx];
+            if (h.days[dIdx]) launchHabitParticles(clickEvent?.currentTarget);
+            saveState(false);
+            renderHabitsSection(getActiveWeek());
+        }
+
+        function removeHabit(hIdx) {
+            getActiveWeek().habits.splice(hIdx, 1);
+            saveState();
+            renderHabitsSection(getActiveWeek());
+        }
+
+        function switchNotesTasksTab(tab) {
+            activeNotesTasksTab = tab;
+            document.getElementById('notesPanel').classList.toggle('hidden', tab !== 'notes');
+            document.getElementById('tasksPanel').classList.toggle('hidden', tab !== 'tasks');
+            const notesBtn = document.getElementById('notesTabBtn');
+            const tasksBtn = document.getElementById('tasksTabBtn');
+            notesBtn.style.background = tab === 'notes' ? 'var(--primary)' : 'var(--card-elevated)';
+            notesBtn.style.color = tab === 'notes' ? '#FAF6EE' : 'var(--ink-dark)';
+            tasksBtn.style.background = tab === 'tasks' ? 'var(--primary)' : 'var(--card-elevated)';
+            tasksBtn.style.color = tab === 'tasks' ? '#FAF6EE' : 'var(--ink-dark)';
+        }
+
+        function renderPersonalTasks(weekData) {
+            const list = document.getElementById('personalTasksList');
+            if (!list) return;
+            list.innerHTML = '';
+            const tasks = weekData.checklist || [];
+            if (!tasks.length) {
+                list.innerHTML = '<p class="text-xs opacity-60 text-center py-5">Todavía no hay tareas. Agregá la primera arriba.</p>';
+                return;
+            }
+            tasks.forEach((task, idx) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 rounded-lg border p-2.5';
+                row.style.background = 'var(--card-elevated)';
+                row.style.borderColor = 'var(--border-ornament)';
+                row.innerHTML = `<button type="button" onclick="togglePersonalTask(${idx})" class="w-5 h-5 flex-shrink-0 rounded border flex items-center justify-center text-xs" style="border-color:var(--accent-gold);background:${task.done ? 'var(--primary)' : 'transparent'};color:#fff">${task.done ? '✓' : ''}</button><span class="text-xs flex-1 break-words ${task.done ? 'line-through opacity-55' : 'font-medium'}">${escapeHtml(task.text)}</span><button type="button" onclick="deletePersonalTask(${idx})" class="text-xs opacity-55 hover:opacity-100 px-1" aria-label="Eliminar tarea">✕</button>`;
+                list.appendChild(row);
+            });
+        }
+
+        function addPersonalTask(e) {
+            e.preventDefault();
+            const input = document.getElementById('newPersonalTaskInput');
+            const value = input.value.trim();
+            if (!value) return;
+            const week = getActiveWeek();
+            if (!Array.isArray(week.checklist)) week.checklist = [];
+            week.checklist.push({ id: 'cl_' + Date.now(), text: value, done: false });
+            input.value = '';
+            saveState();
+            renderPersonalTasks(week);
+        }
+
+        function togglePersonalTask(idx) {
+            const week = getActiveWeek();
+            if (!week.checklist?.[idx]) return;
+            week.checklist[idx].done = !week.checklist[idx].done;
+            saveState(false);
+            renderPersonalTasks(week);
+        }
+
+        function deletePersonalTask(idx) {
+            const week = getActiveWeek();
+            week.checklist.splice(idx, 1);
+            saveState();
+            renderPersonalTasks(week);
+        }
+
+        function launchHabitParticles(origin) {
+            if (!origin) return;
+            const rect = origin.getBoundingClientRect();
+            const colors = ['#D4A349', '#C86A47', '#6BA2DC', '#F2ECE1', '#64A890'];
+            for (let i = 0; i < 18; i++) {
+                const particle = document.createElement('span');
+                const angle = (Math.PI * 2 * i) / 18;
+                const distance = 24 + Math.random() * 34;
+                particle.className = 'habit-particle';
+                particle.style.left = `${rect.left + rect.width / 2}px`;
+                particle.style.top = `${rect.top + rect.height / 2}px`;
+                particle.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+                particle.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+                particle.style.background = colors[i % colors.length];
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 950);
+            }
+        }
+
+        function renderExLibrisNotes(weekData) {
+            const grid = document.getElementById('exLibrisGrid');
+            grid.innerHTML = '';
+
+            if (weekData.notes.length === 0) {
+                grid.innerHTML = `<p class="col-span-2 text-center text-xs opacity-60 py-6">No hay fichas archivadas esta semana.</p>`;
+                return;
+            }
+
+            weekData.notes.forEach((note, idx) => {
+                const card = document.createElement('div');
+                const isAlt = idx % 2 === 1;
+                card.style.backgroundColor = isAlt ? 'var(--secondary-soft)' : 'var(--primary-soft)';
+                card.style.borderColor = 'var(--border-ornament)';
+                card.className = 'p-3 rounded-xl border flex flex-col justify-between min-h-[96px] relative';
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5">
+                        <span style="color: var(--accent-gold);" class="font-nouveau text-[11px] font-bold tracking-wider">
+                            EX-LIBRIS · ${note.code || `0${idx + 1}`}
+                        </span>
+                        <button type="button" onclick="removeExLibrisNote(${idx})" class="text-xs opacity-60 hover:opacity-100">✕</button>
+                    </div>
+                    <p class="text-xs font-medium leading-relaxed break-words">${escapeHtml(note.text)}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addExLibrisNote(e) {
+            e.preventDefault();
+            const inp = document.getElementById('newNoteInput');
+            const text = inp.value.trim();
+            if (!text) return;
+            const week = getActiveWeek();
+            const nextNum = String(week.notes.length + 1).padStart(2, '0');
+            week.notes.unshift({
+                id: 'nt_' + Date.now(),
+                code: `EX-${nextNum}`,
+                text
+            });
+            inp.value = '';
+            saveState();
+            renderExLibrisNotes(week);
+        }
+
+        function removeExLibrisNote(idx) {
+            const week = getActiveWeek();
+            week.notes.splice(idx, 1);
+            saveState();
+            renderExLibrisNotes(week);
+        }
+
+        /* =====================================================================
+           UTILIDADES DE INTERFAZ Y SANITIZACIÓN
+        ===================================================================== */
+        let toastTimeout;
+        function triggerToast(message) {
+            const toast = document.getElementById('statusToast');
+            document.getElementById('statusToastMessage').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2300);
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        async function saveToCloud() {
+            if (!cloudReady || !currentUser) return;
+            const { error } = await supabaseClient.from('planner_data').upsert({
+                user_id: currentUser.id,
+                data: appState,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+            if (error) console.error('Error sincronizando con Supabase:', error.message);
+        }
+
+        async function loadCloudAndStart(user) {
+            currentUser = user;
+            const { data, error } = await supabaseClient.from('planner_data').select('data').eq('user_id', user.id).maybeSingle();
+            if (error) throw error;
+            if (data?.data && typeof data.data === 'object') {
+                appState = data.data;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            } else {
+                try {
+                    const local = localStorage.getItem(STORAGE_KEY);
+                    if (local) appState = JSON.parse(local);
+                } catch (_) {}
+            }
+            cloudReady = true;
+            document.getElementById('authGate').classList.add('hidden');
+            initializePlanner();
+            await saveToCloud();
+        }
+
+        async function startAuthentication() {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (error) throw error;
+            if (session?.user) {
+                await loadCloudAndStart(session.user);
+            } else {
+                document.getElementById('authGate').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const button = document.getElementById('loginButton');
+            const errorBox = document.getElementById('loginError');
+            button.disabled = true;
+            button.textContent = 'Conectando...';
+            errorBox.textContent = '';
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                errorBox.textContent = 'No se pudo iniciar sesión. Revisá el correo y la contraseña.';
+                button.disabled = false;
+                button.textContent = 'Entrar al almanaque';
+                return;
+            }
+            try {
+                await loadCloudAndStart(data.user);
+            } catch (err) {
+                errorBox.textContent = 'Se inició sesión, pero no se pudieron cargar los datos. Revisá la conexión.';
+                console.error(err);
+                button.disabled = false;
+                button.textContent = 'Reintentar';
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => startAuthentication().catch(err => {
+            console.error('Error de inicio:', err);
+            document.getElementById('loginError').textContent = 'No se pudo conectar con el servidor. Revisá tu conexión.';
+        }));
+        window.addEventListener('resize', () => {
+            const weekData = getActiveWeek();
+            if (!weekData || !weekData.priorities) return;
+            weekData.priorities.forEach((_, idx) => {
+                const inputEl = document.getElementById(`priority-input-${idx}`);
+                if (inputEl) evaluatePriorityOverflow(idx, inputEl);
+            });
+        });
+    </script>
+
+    <script>
+      // Registro de la aplicación instalable (PWA). La sincronización sigue usando Supabase.
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch((error) => {
+            console.warn('No se pudo registrar el modo instalable:', error);
+          });
+        });
+      }
+    </script>
+</body>
+</html>
