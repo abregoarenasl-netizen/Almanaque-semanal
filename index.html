@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#0D141F">
     <meta name="description" content="Organizador semanal personal: prioridades, agenda, hábitos, notas y tareas.">
     <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
-    <title>Almanaque Semanal — Art Nouveau & Botánico</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <title>Organizador semanal</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -245,12 +245,17 @@
         }
         .habit-particle { position:fixed; width:6px; height:6px; border-radius:50%; z-index:120; pointer-events:none; box-shadow:0 0 8px currentColor; animation:habitBurst .85s ease-out forwards; }
         @keyframes habitBurst { 0% { opacity:1; transform:translate(-50%,-50%) scale(.5) rotate(0deg); } 100% { opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.7) rotate(180deg); } }
+        .light-particle { position:fixed; width:3px; height:3px; border-radius:50%; z-index:125; pointer-events:none; box-shadow:0 0 7px 2px currentColor; animation:lightBurst .8s ease-out forwards; }
+        @keyframes lightBurst { 0% { opacity:0; transform:translate(-50%,-50%) scale(.3); } 15% { opacity:1; } 100% { opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.25); } }
+        .day-open-animation { animation:dayReveal .58s cubic-bezier(.2,.8,.2,1) both; transform-origin:top center; }
+        @keyframes dayReveal { 0% { opacity:0; transform:perspective(900px) rotateX(-13deg) scaleY(.88); clip-path:inset(0 0 70% 0 round 18px); } 100% { opacity:1; transform:perspective(900px) rotateX(0) scaleY(1); clip-path:inset(0 0 0 0 round 18px); } }
+        @media (prefers-reduced-motion:reduce) { .day-open-animation,.light-particle { animation:none !important; } }
     </style>
 </head>
 <body class="p-3 sm:p-5 lg:p-7" data-theme="complementarios">
     <div id="authGate" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:var(--bg-paper);">
         <div class="nouveau-frame w-full max-w-md p-6">
-            <div class="text-center mb-5"><div class="font-nouveau text-3xl font-bold">Almanaque Semanal</div><p class="text-sm opacity-75 mt-2">Iniciá sesión para sincronizar tus semanas</p></div>
+            <div class="text-center mb-5"><div class="font-nouveau text-3xl font-bold">Organizador semanal</div><p class="text-sm opacity-75 mt-2">Iniciá sesión para sincronizar tus semanas</p></div>
             <form id="loginForm" class="space-y-3">
                 <label class="block text-xs font-bold">Correo electrónico</label>
                 <input id="loginEmail" type="email" required autocomplete="username" placeholder="tu correo" class="w-full rounded-lg border px-3 py-2 text-sm" style="background:var(--card-elevated);border-color:var(--border-ornament);color:var(--ink-dark);">
@@ -287,45 +292,14 @@
             </svg>
 
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 px-2 sm:px-4">
-                <!-- Bloque Izquierdo: Título de Almanaque y Navegación Semanal -->
-                <div class="space-y-3 flex-1">
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        <span style="background-color: var(--primary); color: #FAF6EE;" class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border border-current">
-                            ❧ Almanaque Semanal Ilustrado
-                        </span>
-                        <span id="weekDatesLabel" style="background-color: var(--secondary-soft); color: var(--secondary); border-color: var(--secondary);" class="px-3 py-1 rounded-full text-xs font-bold border">
-                            Cargando semana...
-                        </span>
+                <!-- Encabezado editorial del organizador -->
+                <div class="space-y-2 flex-1 py-1">
+                    <div class="font-nouveau text-4xl sm:text-5xl lg:text-6xl font-bold tracking-wide leading-tight" style="color:var(--accent-gold); text-shadow:0 2px 18px var(--aura-glow);">
+                        Organizador semanal
                     </div>
-
-                    <div class="flex items-center gap-3">
-                        <!-- Medallón botánico SVG -->
-                        <div style="background-color: var(--primary-soft); color: var(--accent-gold); border-color: var(--border-ornament);" class="w-11 h-11 rounded-full border-2 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
-                                <path d="M12 21V11M12 11C12 7 8 4 4 4C4 8 7 11 12 11ZM12 11C12 7 16 4 20 4C20 8 17 11 12 11ZM12 15C9 15 6 13 5 11M12 15C15 15 18 13 19 11" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <input
-                            type="text"
-                            id="plannerTitleInput"
-                            aria-label="Título del organizador semanal"
-                            value="Grimorio Nocturno de Ritmo, Estudio & Creación"
-                            class="font-nouveau text-2xl sm:text-3xl lg:text-4xl font-bold bg-transparent hover:bg-white/5 focus:bg-black/35 px-2.5 py-1 rounded-lg border border-transparent focus:border-current outline-none w-full max-w-2xl"
-                        />
-                    </div>
-
-                    <!-- Controles de Navegación Temporal -->
-                    <div class="flex flex-wrap items-center gap-2 pt-1">
-                        <button onclick="changeWeek(-1)" style="background-color: var(--card-elevated); color: var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm flex items-center gap-1.5">
-                            <span>←</span> Semana Anterior
-                        </button>
-                        <button onclick="changeWeek(0)" style="background-color: var(--primary); color: #FAF6EE;" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm flex items-center gap-1.5">
-                            <span>◈</span> Hoy
-                        </button>
-                        <button onclick="changeWeek(1)" style="background-color: var(--card-elevated); color: var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm flex items-center gap-1.5">
-                            Semana Siguiente <span>→</span>
-                        </button>
-                        <span class="opacity-30 mx-1 hidden sm:inline">|</span>
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <span class="font-nouveau italic text-xl sm:text-2xl" style="color:var(--secondary);">La semana</span>
+                        <span id="weekDatesLabel" class="font-nouveau text-base sm:text-lg tracking-wide" style="color:var(--ink-muted);">Cargando fechas...</span>
                     </div>
                 </div>
 
@@ -430,18 +404,18 @@
              3. AGENDA HORARIA DIARIA (06:30 A 23:00) — COLUMNAS DESLIZABLES
         ================================================================== -->
         <section aria-label="Agenda horaria semanal">
-            <!-- Barra superior con controles para deslizar columnas izquierda/derecha o enfocar un día -->
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-3 px-1">
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda Horaria (06:30 — 23:00)</h2>
-                </div>
+            <!-- Navegación semanal ubicada directamente sobre los días -->
+            <div class="flex flex-wrap items-center gap-2 mb-3 px-1">
+                <button onclick="changeWeek(-1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">← Semana anterior</button>
+                <button onclick="changeWeek(0)" style="background-color:var(--primary);color:#FAF6EE;" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">✦ Hoy</button>
+                <button onclick="changeWeek(1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">Semana siguiente →</button>
+            </div>
 
-                <!-- Selector rápido para centrar un día en el carril o mostrar todas las columnas -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3 px-1">
+                <h2 class="font-nouveau text-xl sm:text-2xl font-bold">Agenda Horaria (06:30 — 23:00)</h2>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <span class="text-xs font-semibold opacity-75 mr-1">Ir a día:</span>
-                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="nouveau-btn px-2.5 py-1 text-xs">
-                        Todos (7)
-                    </button>
+                    <button onclick="setFocusedDay(null)" id="focus-btn-all" class="nouveau-btn px-2.5 py-1 text-xs">Todos (7)</button>
                     <div id="dayQuickJumpButtons" class="flex flex-wrap gap-1"></div>
                 </div>
             </div>
@@ -683,9 +657,10 @@
         let cloudSaveTimer = null;
         let activeNotesTasksTab = 'notes';
         let weekOffset = 0;
-        let focusedDayIndex = null; // null = mostrar los 7 días en columnas deslizables; 0..6 = centrar un día
+        let focusedDayIndex = (new Date().getDay() + 6) % 7; // Al iniciar, abrir el día actual
         let inlineEditorState = null; // { dayIdx, hour } para edición directa en la fila horaria
         let lastShimmeryTaskId = null;
+        let animateFocusedDay = true;
 
         let appState = {
             theme: 'complementarios',
@@ -737,48 +712,8 @@
                         done: false
                     }
                 ],
-                // Actividades distribuidas en horarios reales entre 06:30 y 23:00
-                tasks: [
-                    // Lunes
-                    [
-                        { id: 't101', hour: '07:00', text: 'Infusión herbal y estiramientos matutinos', category: 'bienestar', done: true },
-                        { id: 't102', hour: '09:30', text: 'Planificación estratégica de proyectos', category: 'trabajo', done: true },
-                        { id: 't103', hour: '18:30', text: 'Lectura de historia del arte y apuntes', category: 'estudio', done: false }
-                    ],
-                    // Martes
-                    [
-                        { id: 't201', hour: '08:00', text: 'Bocetos e ilustración de láminas', category: 'creatividad', done: true },
-                        { id: 't202', hour: '14:00', text: 'Revisión de entregables con el equipo', category: 'trabajo', done: false },
-                        { id: 't203', hour: '20:00', text: 'Cena tranquila y música instrumental', category: 'personal', done: false }
-                    ],
-                    // Miércoles
-                    [
-                        { id: 't301', hour: '06:30', text: 'Caminata al amanecer por el parque', category: 'bienestar', done: true },
-                        { id: 't302', hour: '11:00', text: 'Seminario de investigación editorial', category: 'estudio', done: false },
-                        { id: 't303', hour: '17:30', text: 'Taller de encuadernación artesanal', category: 'creatividad', done: false }
-                    ],
-                    // Jueves
-                    [
-                        { id: 't401', hour: '09:00', text: 'Redacción de informe y síntesis', category: 'trabajo', done: false },
-                        { id: 't402', hour: '15:30', text: 'Café y conversación con mentores', category: 'personal', done: false }
-                    ],
-                    // Viernes
-                    [
-                        { id: 't501', hour: '07:30', text: 'Práctica de respiración y movilidad', category: 'bienestar', done: false },
-                        { id: 't502', hour: '10:30', text: 'Cierre semanal y archivo de avances', category: 'trabajo', done: false },
-                        { id: 't503', hour: '21:00', text: 'Velada de cine clásico en casa', category: 'personal', done: false }
-                    ],
-                    // Sábado
-                    [
-                        { id: 't601', hour: '09:30', text: 'Visita a librería y feria de anticuarios', category: 'creatividad', done: false },
-                        { id: 't602', hour: '16:00', text: 'Acuarela botánica en el jardín', category: 'creatividad', done: false }
-                    ],
-                    // Domingo
-                    [
-                        { id: 't701', hour: '10:00', text: 'Preparación de menú saludable semanal', category: 'bienestar', done: false },
-                        { id: 't702', hour: '19:00', text: 'Ordenar escritorio y preparar lunes', category: 'personal', done: false }
-                    ]
-                ],
+                // La agenda comienza vacía en los siete días.
+                tasks: Array.from({ length: 7 }, () => []),
                 habits: [
                     { id: 'h1', name: '🌿 Caminata matutina 30m', days: [true, true, true, false, false, false, false] },
                     { id: 'h2', name: '📖 Lectura sin pantallas', days: [true, false, true, true, false, false, false] },
@@ -804,12 +739,24 @@
                 console.warn('Error leyendo almacenamiento local:', e);
             }
 
+            if (!appState.weeks || typeof appState.weeks !== 'object') appState.weeks = {};
             const mondayKey = getMondayISO(weekOffset);
-            if (!appState.weeks[mondayKey]) {
-                appState.weeks[mondayKey] = createDefaultWeekData();
+            if (!appState.weeks[mondayKey]) appState.weeks[mondayKey] = createDefaultWeekData();
+
+            // Limpieza única de las actividades de demostración que estaban cargadas en las semanas anteriores.
+            if (!appState.migrations) appState.migrations = {};
+            if (!appState.migrations.emptyDemoSchedulesV1) {
+                Object.values(appState.weeks).forEach(w => {
+                    w.tasks = Array.from({ length: 7 }, () => []);
+                });
+                appState.migrations.emptyDemoSchedulesV1 = true;
                 saveState(false);
             }
-            Object.values(appState.weeks).forEach(w => { if (!Array.isArray(w.checklist)) w.checklist = []; });
+            Object.values(appState.weeks).forEach(w => {
+                if (!Array.isArray(w.checklist)) w.checklist = [];
+                if (!Array.isArray(w.notes)) w.notes = [];
+                if (!Array.isArray(w.tasks)) w.tasks = Array.from({ length: 7 }, () => []);
+            });
 
             if (!COLOR_THEORY_META[appState.theme]) {
                 appState.theme = 'complementarios';
@@ -879,6 +826,7 @@
         function changeWeek(delta) {
             weekOffset = delta === 0 ? 0 : weekOffset + delta;
             inlineEditorState = null;
+            animateFocusedDay = focusedDayIndex !== null;
             renderAll();
             triggerToast(delta === 0 ? 'Semana actual' : 'Semana actualizada');
         }
@@ -899,8 +847,7 @@
             const mondayISO = getMondayISO(weekOffset);
             const weekData = getActiveWeek();
 
-            document.getElementById('weekDatesLabel').textContent = `📅 ${formatWeekSpan(mondayISO)}`;
-            document.getElementById('plannerTitleInput').value = weekData.title;
+            document.getElementById('weekDatesLabel').textContent = formatWeekSpan(mondayISO);
 
             renderTopPriorities(weekData);
             renderQuickDayFilters();
@@ -910,11 +857,6 @@
             renderPersonalTasks(weekData);
             updateGlobalProgress(weekData);
         }
-
-        document.getElementById('plannerTitleInput').addEventListener('input', (e) => {
-            getActiveWeek().title = e.target.value;
-            saveState(false);
-        });
 
         /* =====================================================================
            TOP 3 PRIORIDADES: DESPLAZAMIENTO HORIZONTAL SOLO SI EL TEXTO ES LARGO
@@ -939,7 +881,7 @@
                     <!-- Checkbox de cumplimiento -->
                     <button
                         type="button"
-                        onclick="togglePriorityStatus(${idx})"
+                        onclick="togglePriorityStatus(${idx}, this)"
                         title="Marcar prioridad como cumplida"
                         style="border-color: var(--border-ornament); background-color: ${prio.done ? 'var(--primary)' : 'var(--bg-paper-deep)'}; color: #FAF6EE;"
                         class="w-5 h-5 rounded border flex items-center justify-center text-xs font-bold flex-shrink-0 cursor-pointer"
@@ -1038,9 +980,10 @@
             saveState(notify);
         }
 
-        function togglePriorityStatus(idx) {
+        function togglePriorityStatus(idx, button) {
             const item = getActiveWeek().priorities[idx];
             item.done = !item.done;
+            if (item.done) launchTinyLightParticles(button);
             saveState(false);
             renderTopPriorities(getActiveWeek());
             if (item.done) triggerToast('Prioridad completada ✦');
@@ -1087,6 +1030,7 @@
 
         function setFocusedDay(idx) {
             focusedDayIndex = idx;
+            animateFocusedDay = idx !== null;
             renderAll();
             if (idx === null) {
                 const container = document.getElementById('weekDaysContainer');
@@ -1143,6 +1087,7 @@
                     ? 'w-full max-w-none h-[calc(100vh-220px)] min-h-[520px]'
                     : 'w-[78vw] sm:w-[310px] md:w-[295px] lg:w-[285px] h-[590px] flex-shrink-0';
                 card.className = `nouveau-frame flex flex-col overflow-hidden ${colWidthClass}`;
+                if (focusedDayIndex !== null && animateFocusedDay) card.classList.add('day-open-animation');
 
                 // Alternar tono de cabecera entre primario y secundario de la armonía elegida
                 const headerBg = dayIdx % 2 === 0 ? 'var(--primary)' : 'var(--secondary)';
@@ -1256,7 +1201,7 @@
                                     <div class="flex items-start gap-1.5">
                                         <button
                                             type="button"
-                                            onclick="toggleTaskCompletion(${dayIdx}, '${task.id}')"
+                                            onclick="toggleTaskCompletion(${dayIdx}, '${task.id}', this)"
                                             style="border-color: ${cat.color}; background-color: ${task.done ? cat.color : 'var(--bg-paper-deep)'}; color: #FFFFFF;"
                                             class="mt-0.5 w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center text-[10px] font-bold cursor-pointer"
                                         >
@@ -1303,6 +1248,7 @@
                 card.innerHTML = html;
                 grid.appendChild(card);
             });
+            animateFocusedDay = false;
 
             if (inlineEditorState) {
                 const inp = document.getElementById('inlineTaskInput');
@@ -1340,10 +1286,11 @@
             renderAll();
         }
 
-        function toggleTaskCompletion(dayIdx, taskId) {
+        function toggleTaskCompletion(dayIdx, taskId, button) {
             const task = getActiveWeek().tasks[dayIdx].find(t => t.id === taskId);
             if (!task) return;
             task.done = !task.done;
+            if (task.done) launchTinyLightParticles(button);
             lastShimmeryTaskId = task.done ? task.id : null;
             saveState(false);
             renderAll();
@@ -1571,7 +1518,7 @@
                 row.className = 'flex items-center gap-2 rounded-lg border p-2.5';
                 row.style.background = 'var(--card-elevated)';
                 row.style.borderColor = 'var(--border-ornament)';
-                row.innerHTML = `<button type="button" onclick="togglePersonalTask(${idx})" class="w-5 h-5 flex-shrink-0 rounded border flex items-center justify-center text-xs" style="border-color:var(--accent-gold);background:${task.done ? 'var(--primary)' : 'transparent'};color:#fff">${task.done ? '✓' : ''}</button><span class="text-xs flex-1 break-words ${task.done ? 'line-through opacity-55' : 'font-medium'}">${escapeHtml(task.text)}</span><button type="button" onclick="deletePersonalTask(${idx})" class="text-xs opacity-55 hover:opacity-100 px-1" aria-label="Eliminar tarea">✕</button>`;
+                row.innerHTML = `<button type="button" onclick="togglePersonalTask(${idx}, this)" class="w-5 h-5 flex-shrink-0 rounded border flex items-center justify-center text-xs" style="border-color:var(--accent-gold);background:${task.done ? 'var(--primary)' : 'transparent'};color:#fff">${task.done ? '✓' : ''}</button><span class="text-xs flex-1 break-words ${task.done ? 'line-through opacity-55' : 'font-medium'}">${escapeHtml(task.text)}</span><button type="button" onclick="deletePersonalTask(${idx})" class="text-xs opacity-55 hover:opacity-100 px-1" aria-label="Eliminar tarea">✕</button>`;
                 list.appendChild(row);
             });
         }
@@ -1589,10 +1536,11 @@
             renderPersonalTasks(week);
         }
 
-        function togglePersonalTask(idx) {
+        function togglePersonalTask(idx, button) {
             const week = getActiveWeek();
             if (!week.checklist?.[idx]) return;
             week.checklist[idx].done = !week.checklist[idx].done;
+            if (week.checklist[idx].done) launchTinyLightParticles(button);
             saveState(false);
             renderPersonalTasks(week);
         }
@@ -1623,12 +1571,32 @@
             }
         }
 
+        function launchTinyLightParticles(origin) {
+            if (!origin) return;
+            const rect = origin.getBoundingClientRect();
+            const colors = ['#F8D98A', '#FFFFFF', '#D4A349', '#A9D8FF', '#F6C7E8'];
+            for (let i = 0; i < 14; i++) {
+                const particle = document.createElement('span');
+                const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.28;
+                const distance = 15 + Math.random() * 25;
+                particle.className = 'light-particle';
+                particle.style.left = `${rect.left + rect.width / 2}px`;
+                particle.style.top = `${rect.top + rect.height / 2}px`;
+                particle.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+                particle.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+                particle.style.background = colors[i % colors.length];
+                particle.style.color = colors[i % colors.length];
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 850);
+            }
+        }
+
         function renderExLibrisNotes(weekData) {
             const grid = document.getElementById('exLibrisGrid');
             grid.innerHTML = '';
 
             if (weekData.notes.length === 0) {
-                grid.innerHTML = `<p class="col-span-2 text-center text-xs opacity-60 py-6">No hay fichas archivadas esta semana.</p>`;
+                grid.innerHTML = `<p class="col-span-2 text-center text-xs opacity-60 py-6">Todavía no hay notas esta semana.</p>`;
                 return;
             }
 
@@ -1640,11 +1608,9 @@
                 card.className = 'p-3 rounded-xl border flex flex-col justify-between min-h-[96px] relative';
 
                 card.innerHTML = `
-                    <div class="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5">
-                        <span style="color: var(--accent-gold);" class="font-nouveau text-[11px] font-bold tracking-wider">
-                            EX-LIBRIS · ${note.code || `0${idx + 1}`}
-                        </span>
-                        <button type="button" onclick="removeExLibrisNote(${idx})" class="text-xs opacity-60 hover:opacity-100">✕</button>
+                    <div class="flex items-center justify-between gap-2 border-b border-white/15 pb-1 mb-1.5">
+                        <input type="text" maxlength="60" aria-label="Título de la nota" placeholder="Título" value="${escapeHtml(note.title || '')}" oninput="updateNoteTitle(${idx}, this.value)" style="color:var(--accent-gold);background:transparent;" class="font-nouveau text-sm font-bold tracking-wide min-w-0 w-full outline-none placeholder:opacity-60" />
+                        <button type="button" onclick="removeExLibrisNote(${idx})" class="text-xs opacity-60 hover:opacity-100 flex-shrink-0">✕</button>
                     </div>
                     <p class="text-xs font-medium leading-relaxed break-words">${escapeHtml(note.text)}</p>
                 `;
@@ -1658,15 +1624,21 @@
             const text = inp.value.trim();
             if (!text) return;
             const week = getActiveWeek();
-            const nextNum = String(week.notes.length + 1).padStart(2, '0');
             week.notes.unshift({
                 id: 'nt_' + Date.now(),
-                code: `EX-${nextNum}`,
+                title: '',
                 text
             });
             inp.value = '';
             saveState();
             renderExLibrisNotes(week);
+        }
+
+        function updateNoteTitle(idx, value) {
+            const week = getActiveWeek();
+            if (!week.notes[idx]) return;
+            week.notes[idx].title = value;
+            saveState(false);
         }
 
         function removeExLibrisNote(idx) {

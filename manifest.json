@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Almanaque Semanal — Art Nouveau & Botánico",
-  "short_name": "Almanaque",
+  "name": "Organizador semanal",
+  "short_name": "Organizador",
   "description": "Organizador semanal personal: prioridades, agenda, hábitos, notas y tareas.",
   "lang": "es-AR",
   "start_url": "./",
