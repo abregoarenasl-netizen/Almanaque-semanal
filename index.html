@@ -262,10 +262,56 @@
         @keyframes lightBurst { 0% { opacity:0; transform:translate(-50%,-50%) scale(.3); } 15% { opacity:1; } 100% { opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.25); } }
 
         @media (prefers-reduced-motion:reduce) { .day-open-animation,.light-particle { animation:none !important; } }
+
+        /* Presentaciones adaptables: móvil, tablet y escritorio */
+        .theme-option { min-height: 62px; background:var(--card-elevated); color:var(--ink-dark); border-color:color-mix(in srgb,var(--border-ornament) 65%,transparent); }
+        .theme-option[style*="background-color: var(--primary)"] { box-shadow:0 0 0 1px var(--accent-gold),0 5px 16px var(--aura-glow); }
+        .day-add-activity { min-height:42px; }
+        @media (max-width: 767px) {
+            body { padding:10px !important; }
+            .max-w-\[1720px\] { width:100%; }
+            header.nouveau-frame { padding:18px 13px !important; }
+            header .font-display { font-size:clamp(1.65rem,8vw,2.35rem) !important; line-height:1.15 !important; overflow-wrap:anywhere; }
+            #weekDatesLabel { font-size:clamp(.95rem,4.3vw,1.15rem) !important; text-align:center; }
+            #globalProgressText { font-size:11px; white-space:nowrap; }
+            .nouveau-frame { border-radius:15px; }
+            section[aria-label="Agenda horaria semanal"] .flex.flex-wrap.items-center.justify-between { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+            section[aria-label="Agenda horaria semanal"] .flex.flex-wrap.items-center.justify-between > button { min-height:40px; padding:8px 6px; font-size:11px; }
+            section[aria-label="Agenda horaria semanal"] .flex.flex-col.lg\:flex-row { align-items:stretch; }
+            .day-filter-track { width:100%; border-radius:14px; overflow-x:auto; flex-wrap:nowrap !important; white-space:nowrap; padding:7px; }
+            #dayQuickJumpButtons { flex-wrap:nowrap !important; }
+            .day-filter-btn { flex:0 0 auto; min-width:39px; }
+            #weekDaysContainer { overflow:visible !important; padding-bottom:0; }
+            #weekDaysGrid { display:grid !important; grid-template-columns:minmax(0,1fr) !important; width:100% !important; gap:13px !important; }
+            #weekDaysGrid > article { width:100% !important; max-width:none !important; height:auto !important; min-height:0 !important; }
+            #weekDaysGrid > article .timeline-scroll { flex:initial !important; max-height:52vh; overflow-y:auto; }
+            .day-heading { font-size:clamp(1.2rem,6vw,1.65rem) !important; letter-spacing:.035em; }
+            .day-date-line { font-size:10px; letter-spacing:.12em; }
+            .day-add-activity { font-size:12px; min-height:44px; }
+            #scheduleModal { align-items:flex-end !important; padding:8px !important; }
+            #scheduleModal > div { width:100%; max-width:none; max-height:92dvh; overflow-y:auto; padding:18px 15px !important; border-radius:18px 18px 12px 12px; }
+            #modalCategorySelector { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:7px !important; }
+            .activity-category-card { min-height:72px; padding:8px 4px; }
+            .activity-category-card .category-symbol { font-size:23px; }
+            .theme-options { grid-template-columns:repeat(3,minmax(0,1fr)); }
+            .theme-option { padding:9px 5px; min-height:58px; }
+            .theme-option span { font-size:22px; }
+            .grid.grid-cols-1.lg\:grid-cols-12 { gap:13px; }
+            input,select,textarea { max-width:100%; min-width:0; }
+        }
+        @media (min-width: 768px) and (max-width: 1199px) {
+            #weekDaysGrid { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; width:100% !important; gap:14px !important; }
+            #weekDaysContainer { overflow:visible !important; }
+            #weekDaysGrid > article { width:100% !important; max-width:none !important; height:590px; }
+        }
+        @media (min-width: 1200px) {
+            #weekDaysGrid > article { max-width:285px; }
+        }
+        @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
     </style>
 </head>
 <body class="p-3 sm:p-5 lg:p-7" data-theme="complementarios">
-    <div id="authGate" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:var(--bg-paper);">
+    <div id="authGate" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:var(--bg-paper);">
         <div class="nouveau-frame w-full max-w-md p-6">
             <div class="text-center mb-5"><div class="font-nouveau text-3xl font-bold">Organizador semanal</div><p class="text-sm opacity-75 mt-2">Iniciá sesión para sincronizar tus semanas</p></div>
             <form id="loginForm" class="space-y-3">
@@ -279,7 +325,7 @@
         </div>
     </div>
 
-    <div class="max-w-[1720px] mx-auto relative z-10 space-y-5">
+    <div id="plannerApp" class="hidden max-w-[1720px] mx-auto relative z-10 space-y-5">
 
         <!-- =================================================================
              1. PORTADA EDITORIAL ART NOUVEAU
@@ -362,7 +408,6 @@
                 <button onclick="changeWeek(-1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">← Semana anterior</button>
                 <button onclick="changeWeek(0)" style="background-color:var(--primary);color:#FAF6EE;" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">✦ Hoy</button>
                 <button onclick="changeWeek(1)" style="background-color:var(--card-elevated);color:var(--ink-dark);" class="nouveau-btn px-3.5 py-1.5 text-xs sm:text-sm">Semana siguiente →</button>
-                <button onclick="openScheduleModal(focusedDayIndex === null ? ((new Date().getDay()+6)%7) : focusedDayIndex, '09:00')" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#FAF6EE;border-color:var(--accent-gold);box-shadow:0 5px 18px var(--aura-glow);" class="nouveau-btn px-4 py-2 text-xs sm:text-sm font-extrabold">＋ Agendar actividad</button>
             </div>
 
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-3 px-1">
@@ -477,26 +522,13 @@
             </div>
         </section>
 
-        <!-- Ajustes cromáticos: sección secundaria al final del organizador -->
+        <!-- Selector simple de temas -->
         <section class="nouveau-frame p-4 sm:p-5">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-full border flex items-center justify-center" style="border-color:var(--border-ornament);color:var(--accent-gold);">
-                        <svg viewBox="0 0 60 60" class="w-7 h-7" fill="none"><circle cx="30" cy="30" r="23" stroke="currentColor" stroke-dasharray="2 3"/><path d="M30 7a23 23 0 0 1 0 46 23 23 0 0 1 0-46Z" stroke="currentColor"/><path d="M30 7v46M7 30h46" stroke="currentColor" opacity=".6"/></svg>
-                    </span>
-                    <div><h2 class="font-nouveau text-xl font-bold">Teoría del color</h2><p class="text-xs opacity-65">Ajustes de armonía y paleta visual</p></div>
-                </div>
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div class="flex items-center gap-2">
-                        <svg id="colorWheelSvg" class="w-9 h-9 flex-shrink-0" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--border-ornament)" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/><circle cx="30" cy="30" r="16" fill="none" stroke="var(--border-ornament)" stroke-width=".8" opacity=".35"/><g id="wheelHarmonyLines" stroke="var(--accent-gold)" stroke-width="1.8" fill="none"></g><g id="wheelHarmonyNodes"></g></svg>
-                        <div><div class="text-[9px] font-bold uppercase tracking-wider opacity-70">Armonía activa</div><div id="harmonyDescription" class="font-nouveau text-xs font-bold">Complementarios (180°)</div></div>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="setColorTheme('complementarios')" id="btn-theme-complementarios" class="nouveau-btn px-3 py-2 text-xs flex items-center gap-2"><span class="inline-flex -space-x-1"><span class="w-3 h-3 rounded-full border border-white/70" style="background:#3B6FA6"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#C86A47"></span></span>Complementarios</button>
-                        <button onclick="setColorTheme('triada')" id="btn-theme-triada" class="nouveau-btn px-3 py-2 text-xs flex items-center gap-2"><span class="inline-flex -space-x-1"><span class="w-3 h-3 rounded-full border border-white/70" style="background:#4A8B74"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#9B5684"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#D69E42"></span></span>Tríada</button>
-                        <button onclick="setColorTheme('analogos')" id="btn-theme-analogos" class="nouveau-btn px-3 py-2 text-xs flex items-center gap-2"><span class="inline-flex -space-x-1"><span class="w-3 h-3 rounded-full border border-white/70" style="background:#438A74"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#397E91"></span><span class="w-3 h-3 rounded-full border border-white/70" style="background:#B5A34C"></span></span>Análogos</button>
-                    </div>
-                </div>
+            <h2 class="font-nouveau text-xl sm:text-2xl font-bold mb-3">Temas</h2>
+            <div class="theme-options grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <button onclick="setColorTheme('complementarios')" id="btn-theme-complementarios" title="Medianoche" aria-label="Tema Medianoche" class="nouveau-btn theme-option px-3 py-3 text-sm font-bold flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🌌</span></button>
+                <button onclick="setColorTheme('triada')" id="btn-theme-triada" title="Tríada" aria-label="Tema Tríada" class="nouveau-btn theme-option px-3 py-3 text-sm font-bold flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🌺</span></button>
+                <button onclick="setColorTheme('analogos')" id="btn-theme-analogos" title="Botánico" aria-label="Tema Botánico" class="nouveau-btn theme-option px-3 py-3 text-sm font-bold flex items-center justify-center gap-2"><span class="text-2xl" aria-hidden="true">🌿</span></button>
             </div>
         </section>
     </div>
@@ -695,6 +727,7 @@
         }
 
         function initializePlanner() {
+            document.getElementById('plannerApp').classList.remove('hidden');
             try {
                 const saved = localStorage.getItem(STORAGE_KEY);
                 if (saved) {
@@ -770,15 +803,7 @@
             appState.theme = themeKey;
             document.body.setAttribute('data-theme', themeKey);
 
-            // Actualizar diagrama SVG del círculo cromático
-            const theory = COLOR_THEORY_META[themeKey];
-            if (theory) {
-                document.getElementById('harmonyDescription').textContent = theory.title;
-                document.getElementById('wheelHarmonyLines').innerHTML = theory.lines;
-                document.getElementById('wheelHarmonyNodes').innerHTML = theory.nodes
-                    .map(n => `<circle cx="${n.cx}" cy="${n.cy}" r="4.5" fill="${n.fill}" stroke="#F8F3E8" stroke-width="1.4" />`)
-                    .join('');
-            }
+            const themeNames = { complementarios: 'Medianoche', triada: 'Tríada', analogos: 'Botánico' };
 
             // Actualizar estado visual de los botones de tema
             Object.keys(COLOR_THEORY_META).forEach(key => {
@@ -795,7 +820,7 @@
 
             saveState(false);
             if (notify) {
-                triggerToast(`Armonía aplicada: ${theory.title}`);
+                triggerToast(`Tema aplicado: ${themeNames[themeKey] || 'Personalizado'}`);
             }
         }
 
@@ -1082,12 +1107,15 @@
                                     <h3 class="day-heading mt-2">${dayMeta.name.toUpperCase()}</h3>
                                     <div class="day-date-line">${formatDayDate(mondayISO, dayIdx)}</div>
                                 </div>
-                                <button type="button" onclick="openScheduleModal(${dayIdx}, '09:00')" title="Agendar en ${dayMeta.name}" aria-label="Agendar actividad" style="background:var(--bg-paper-deep);color:var(--accent-gold);border-color:var(--accent-gold);box-shadow:0 0 16px var(--aura-glow);" class="w-11 h-11 flex-shrink-0 rounded-xl border-2 flex items-center justify-center text-2xl font-bold hover:scale-105 transition-transform">＋</button>
                             </div>
                         </div>
 
+                        <button type="button" onclick="openScheduleModal(${dayIdx}, '09:00')" style="background:linear-gradient(135deg,var(--bg-paper-deep),var(--card-elevated));color:#FAF6EE;border:1px solid var(--accent-gold);box-shadow:0 3px 12px var(--aura-glow);" class="day-add-activity mt-3 w-full rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 text-xs font-extrabold tracking-wide hover:brightness-110 active:scale-[.99]">
+                            <span style="color:var(--accent-gold);font-size:18px;line-height:1;">＋</span> Agendar actividad
+                        </button>
+
                         <!-- Mini barra de progreso diario -->
-                        <div class="mt-2 flex items-center gap-2">
+                        <div class="mt-3 flex items-center gap-2">
                             <div class="flex-1 h-1.5 bg-black/35 rounded-full overflow-hidden">
                                 <div style="width: ${dayPct}%; background-color: var(--accent-gold);" class="h-full rounded-full transition-all duration-300"></div>
                             </div>
@@ -1724,7 +1752,8 @@
 
         window.addEventListener('DOMContentLoaded', () => startAuthentication().catch(err => {
             console.error('Error de inicio:', err);
-            document.getElementById('loginError').textContent = 'No se pudo conectar con el servidor. Revisá tu conexión.';
+            document.getElementById('authGate').classList.remove('hidden');
+            document.getElementById('loginError').textContent = 'No se pudo verificar la sesión. Revisá tu conexión e intentá nuevamente.';
         }));
         window.addEventListener('resize', () => {
             const weekData = getActiveWeek();
