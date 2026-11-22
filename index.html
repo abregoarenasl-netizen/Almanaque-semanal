@@ -300,6 +300,7 @@
         .timeline-now-line{position:absolute;left:48px;right:4px;height:2px;z-index:4;background:var(--accent-gold);box-shadow:0 0 9px var(--aura-glow);pointer-events:none}
         .timeline-now-line::before{content:'Ahora';position:absolute;left:0;top:-10px;padding:1px 5px;border-radius:5px;background:var(--accent-gold);color:var(--ink-dark);font-size:9px;font-weight:900;line-height:16px}
         #syncStatus[data-state="ok"]{color:var(--primary)}#syncStatus[data-state="busy"]{color:var(--accent-gold)}#syncStatus[data-state="error"]{color:var(--secondary)}
+        #accountEmail{overflow-wrap:anywhere;word-break:normal}
         .timeline-event{position:absolute;z-index:2;overflow:hidden;padding:5px 6px;border:1px solid color-mix(in srgb,var(--ink-dark) 20%,transparent);border-left:4px solid;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:4px;min-height:76px}
         .timeline-event.is-done{opacity:.62}
         .timeline-event .event-meta{font-size:10px;line-height:12px;font-weight:800;color:var(--accent-gold);white-space:nowrap}
@@ -613,8 +614,8 @@
             </div>
         </section>
         <section class="nouveau-frame p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" aria-label="Respaldo">
-            <div><h2 class="font-nouveau text-lg font-bold">Respaldo</h2><p class="text-[10px] opacity-65 mt-1">Guardá o restaurá tus datos del organizador.</p></div>
-            <div class="flex flex-wrap gap-2"><button type="button" onclick="exportBackup()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--card-elevated);color:var(--ink-dark);min-height:40px">Exportar respaldo</button><button type="button" onclick="document.getElementById('backupImportInput').click()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--primary);color:var(--ink-dark);min-height:40px">Importar respaldo</button><input id="backupImportInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)"></div>
+            <div><h2 class="font-nouveau text-lg font-bold">Respaldo y sesión</h2><p class="text-[10px] opacity-65 mt-1">Guardá o restaurá tus datos del organizador.</p><p id="accountEmail" class="text-[10px] opacity-70 mt-1"></p></div>
+            <div class="flex flex-wrap gap-2"><button type="button" onclick="exportBackup()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--card-elevated);color:var(--ink-dark);min-height:40px">Exportar respaldo</button><button type="button" onclick="document.getElementById('backupImportInput').click()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--primary);color:var(--ink-dark);min-height:40px">Importar respaldo</button><button type="button" onclick="signOutUser()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--card-bg);color:var(--ink-muted);min-height:40px">Cerrar sesión</button><input id="backupImportInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)"></div>
         </section>
     </div>
 
@@ -831,16 +832,15 @@
             };
         }
 
+        function createEmptyPlannerState(){return {theme:'complementarios',weeks:{},categories:JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),migrations:{}};}
+        function resetCategoriesToDefaults(){Object.keys(CATEGORIES).forEach(key=>delete CATEGORIES[key]);Object.assign(CATEGORIES,JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)));}
+        function readLocalPlannerState(userId){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return null;const saved=JSON.parse(raw);if(saved?.user_id!==userId||!saved.data||typeof saved.data!=='object'||Array.isArray(saved.data)||!saved.data.weeks||typeof saved.data.weeks!=='object'||Array.isArray(saved.data.weeks)){localStorage.removeItem(STORAGE_KEY);return null;}return saved.data;}catch(error){console.warn('Se descartaron datos locales no válidos:',error);localStorage.removeItem(STORAGE_KEY);return null;}}
+        function writeLocalPlannerState(){if(!currentUser?.id)return;localStorage.setItem(STORAGE_KEY,JSON.stringify({user_id:currentUser.id,data:appState}));}
+        function resolvePlannerState(localState,cloudRow){const cloudState=cloudRow?.data&&typeof cloudRow.data==='object'&&!Array.isArray(cloudRow.data)?cloudRow.data:null;if(!cloudState)return createEmptyPlannerState();const localTimestamp=Date.parse(localState?.updatedAt||'')||0;const cloudTimestamp=Date.parse(cloudRow.updated_at||cloudState.updatedAt||'')||0;if(localState&&localTimestamp>cloudTimestamp)return localState;if(!cloudState.updatedAt&&cloudRow.updated_at)cloudState.updatedAt=cloudRow.updated_at;return cloudState;}
+
         function initializePlanner() {
             document.getElementById('plannerApp').classList.remove('hidden');
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    appState = JSON.parse(saved);
-                }
-            } catch (e) {
-                console.warn('Error leyendo almacenamiento local:', e);
-            }
+            resetCategoriesToDefaults();
 
             if (!appState.weeks || typeof appState.weeks !== 'object') appState.weeks = {};
             if (appState.categories && typeof appState.categories === 'object') {
@@ -885,7 +885,7 @@
         function saveState(showFeedback = true) {
             try {
                 appState.updatedAt = new Date().toISOString();
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                writeLocalPlannerState();
                 if (cloudReady && currentUser) {
                     clearTimeout(cloudSaveTimer);
                     if (navigator.onLine === false) setSyncStatus('error');
@@ -1497,7 +1497,7 @@
 
         function exportBackup(){const json=JSON.stringify(appState,null,2);const url=URL.createObjectURL(new Blob([json],{type:'application/json;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=`organizador-respaldo-${localDateISO(new Date())}.json`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
         function validateBackupState(value){if(!value||typeof value!=='object'||Array.isArray(value)||!value.weeks||typeof value.weeks!=='object'||Array.isArray(value.weeks))return false;return Object.values(value.weeks).every(week=>{if(!week||typeof week!=='object'||Array.isArray(week))return false;if(week.tasks!==undefined&&(!Array.isArray(week.tasks)||week.tasks.some(day=>day!==undefined&&!Array.isArray(day))))return false;return true;});}
-        async function importBackupFile(event){const input=event.currentTarget;const file=input.files?.[0];input.value='';if(!file)return;try{const backup=JSON.parse(await file.text());if(!validateBackupState(backup)){triggerToast('El archivo no tiene una estructura de respaldo válida');return;}const choice=await showChoiceDialog('¿Importar este respaldo?','Esto reemplazará todos los datos actuales y sincronizará el respaldo con Supabase.',[{label:'Cancelar',value:'cancel'},{label:'Reemplazar datos',value:'replace'}]);if(choice!=='replace')return;localStorage.setItem(STORAGE_KEY,JSON.stringify(backup));appState=backup;initializePlanner();clearTimeout(cloudSaveTimer);const synced=await saveToCloud();triggerToast(synced?'Respaldo importado y sincronizado':'Respaldo importado localmente; falta sincronizar');}catch(error){console.error('Error importando respaldo:',error);triggerToast('No se pudo importar el respaldo');}}
+        async function importBackupFile(event){const input=event.currentTarget;const file=input.files?.[0];input.value='';if(!file)return;try{const backup=JSON.parse((await file.text()).replace(/^\uFEFF/,''));if(!validateBackupState(backup)){triggerToast('El archivo no tiene una estructura de respaldo válida');return;}const choice=await showChoiceDialog('¿Importar este respaldo?','Esto reemplazará todos los datos actuales y sincronizará el respaldo con Supabase.',[{label:'Cancelar',value:'cancel'},{label:'Reemplazar datos',value:'replace'}]);if(choice!=='replace')return;appState=backup;writeLocalPlannerState();initializePlanner();clearTimeout(cloudSaveTimer);const synced=await saveToCloud();triggerToast(synced?'Respaldo importado y sincronizado':'Respaldo importado localmente; falta sincronizar');}catch(error){console.error('Error importando respaldo:',error);triggerToast('No se pudo importar el respaldo');}}
 
         async function saveToCloud() {
             if (!cloudReady || !currentUser) return;
@@ -1528,22 +1528,37 @@
 
         async function loadCloudAndStart(user) {
             currentUser = user;
-            let localState=null;
-            try{const local=localStorage.getItem(STORAGE_KEY);if(local)localState=JSON.parse(local);}catch(error){console.warn('No se pudo leer el respaldo local:',error);}
+            const localState=readLocalPlannerState(user.id);
             const { data, error } = await supabaseClient.from('planner_data').select('data,updated_at').eq('user_id', user.id).maybeSingle();
             if (error) throw error;
-            const cloudState=data?.data&&typeof data.data==='object'?data.data:null;
-            const localTimestamp=Date.parse(localState?.updatedAt||'')||0;
-            const cloudTimestamp=Date.parse(data?.updated_at||cloudState?.updatedAt||'')||0;
-            if(localState&&(!cloudState||localTimestamp>cloudTimestamp)){appState=localState;}
-            else if(cloudState){appState=cloudState;if(!appState.updatedAt&&data.updated_at)appState.updatedAt=data.updated_at;}
-            else if(localState)appState=localState;
-            localStorage.setItem(STORAGE_KEY,JSON.stringify(appState));
+            appState=resolvePlannerState(localState,data);
+            resetCategoriesToDefaults();
+            writeLocalPlannerState();
             cloudReady = true;
+            document.getElementById('accountEmail').textContent=`Sesión iniciada: ${user.email||'cuenta conectada'}`;
             document.getElementById('authGate').classList.add('hidden');
             initializePlanner();
             clearTimeout(cloudSaveTimer);
             await saveToCloud();
+        }
+
+        function loginFailureMessage(error){const message=String(error?.message||error||'').toLowerCase();if(navigator.onLine===false||error?.name==='TypeError'||/network|failed to fetch|fetch failed|load failed|timeout|connection/.test(message))return 'No se pudo conectar con el servicio. Revisá tu conexión a internet e intentá de nuevo.';if(error?.status===400||/invalid login credentials|invalid email or password|email or password/.test(message))return 'El correo o la contraseña no coinciden. Revisalos e intentá de nuevo.';return 'No se pudo iniciar sesión por un error del servicio. Intentá de nuevo.';}
+
+        async function signOutUser(){
+            const choice=await showChoiceDialog('¿Cerrar sesión?','Se borrarán de este dispositivo los datos locales de esta cuenta. Los datos sincronizados seguirán en Supabase.',[{label:'Seguir usando',value:'cancel'},{label:'Cerrar sesión',value:'signout'}]);
+            if(choice!=='signout')return;
+            const button=document.querySelector('[onclick="signOutUser()"]');if(button)button.disabled=true;
+            clearTimeout(cloudSaveTimer);
+            if(cloudReady&&navigator.onLine!==false)await saveToCloud();
+            try{const {error}=await supabaseClient.auth.signOut();if(error)throw error;}
+            catch(error){console.error('Error cerrando sesión:',error);triggerToast('No se pudo cerrar sesión. Revisá tu conexión e intentá de nuevo.');if(button)button.disabled=false;return;}
+            try{localStorage.removeItem(STORAGE_KEY);}catch(error){console.warn('No se pudo borrar el respaldo local:',error);}
+            cloudSaveTimer=null;cloudReady=false;currentUser=null;lastCloudSyncedAt=null;
+            appState=createEmptyPlannerState();resetCategoriesToDefaults();weekOffset=0;focusedDayIndex=(new Date().getDay()+6)%7;inlineEditorState=null;lastShimmeryTaskId=null;activeNotesTasksTab='notes';animateFocusedDay=false;
+            setColorTheme('complementarios',false);switchNotesTasksTab('notes');
+            document.getElementById('accountEmail').textContent='';document.getElementById('syncStatus').textContent='';document.getElementById('syncStatus').removeAttribute('data-state');
+            document.getElementById('loginForm').reset();document.getElementById('loginError').textContent='';document.getElementById('loginButton').textContent='Entrar al almanaque';document.getElementById('loginButton').disabled=false;
+            renderAll();document.getElementById('plannerApp').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');document.getElementById('loginEmail').focus();
         }
 
         async function startAuthentication() {
@@ -1565,9 +1580,9 @@
             errorBox.textContent = '';
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            let data,error;try{({data,error}=await supabaseClient.auth.signInWithPassword({email,password}));}catch(caught){error=caught;}
             if (error) {
-                errorBox.textContent = 'No se pudo iniciar sesión. Revisá el correo y la contraseña.';
+                errorBox.textContent = loginFailureMessage(error);
                 button.disabled = false;
                 button.textContent = 'Entrar al almanaque';
                 return;
@@ -1585,7 +1600,7 @@
         window.addEventListener('DOMContentLoaded', () => startAuthentication().catch(err => {
             console.error('Error de inicio:', err);
             document.getElementById('authGate').classList.remove('hidden');
-            document.getElementById('loginError').textContent = 'No se pudo verificar la sesión. Revisá tu conexión e intentá nuevamente.';
+            document.getElementById('loginError').textContent = loginFailureMessage(err);
         }));
         document.addEventListener('keydown',handleDialogEscape);
         window.addEventListener('online',()=>{if(cloudReady&&currentUser)saveToCloud();});
