@@ -1,4 +1,4 @@
-const CACHE_NAME = 'organizador-shell-v8';
+const CACHE_NAME = 'organizador-shell-v11';
 const APP_FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {

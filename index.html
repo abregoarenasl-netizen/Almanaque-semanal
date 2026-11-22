@@ -297,6 +297,9 @@
         .timeline-canvas{position:relative;min-height:2720px;background:linear-gradient(90deg,transparent 0 48px,color-mix(in srgb,var(--border-ornament) 16%,transparent) 48px 49px,transparent 49px)}
         .timeline-slot{position:absolute;left:0;right:0;height:80px;border-top:1px solid color-mix(in srgb,var(--ink-muted) 12%,transparent);display:flex;align-items:flex-start;padding:3px 5px;cursor:pointer}
         .timeline-slot .slot-time{width:42px;flex-shrink:0;font-size:10px;font-weight:700;color:var(--ink-muted)}
+        .timeline-now-line{position:absolute;left:48px;right:4px;height:2px;z-index:4;background:var(--accent-gold);box-shadow:0 0 9px var(--aura-glow);pointer-events:none}
+        .timeline-now-line::before{content:'Ahora';position:absolute;left:0;top:-10px;padding:1px 5px;border-radius:5px;background:var(--accent-gold);color:var(--ink-dark);font-size:9px;font-weight:900;line-height:16px}
+        #syncStatus[data-state="ok"]{color:var(--primary)}#syncStatus[data-state="busy"]{color:var(--accent-gold)}#syncStatus[data-state="error"]{color:var(--secondary)}
         .timeline-event{position:absolute;z-index:2;overflow:hidden;padding:5px 6px;border:1px solid color-mix(in srgb,var(--ink-dark) 20%,transparent);border-left:4px solid;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:4px;min-height:76px}
         .timeline-event.is-done{opacity:.62}
         .timeline-event .event-meta{font-size:10px;line-height:12px;font-weight:800;color:var(--accent-gold);white-space:nowrap}
@@ -441,6 +444,7 @@
                     </div>
                     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-3 justify-center xl:justify-start">
                         <span id="weekDatesLabel" class="font-nouveau text-lg sm:text-xl tracking-wide" style="color:var(--ink-muted);">Cargando fechas...</span>
+                        <span id="syncStatus" class="text-[10px] font-bold opacity-75" role="status" aria-live="polite"></span>
                     </div>
                 </div>
 
@@ -608,12 +612,16 @@
                 <button type="button" onclick="setColorTheme('analogos')" id="btn-theme-analogos" title="Botánico" aria-label="Tema Botánico" aria-pressed="false" class="nouveau-btn theme-option" data-theme-choice="analogos"><span class="theme-check">✓</span><span class="theme-emoji">🌿</span><span class="theme-name">Botánico</span><span class="theme-swatches" data-theme="analogos"><i style="background:var(--primary)"></i><i style="background:var(--secondary)"></i><i style="background:var(--accent-gold)"></i></span></button>
             </div>
         </section>
+        <section class="nouveau-frame p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" aria-label="Respaldo">
+            <div><h2 class="font-nouveau text-lg font-bold">Respaldo</h2><p class="text-[10px] opacity-65 mt-1">Guardá o restaurá tus datos del organizador.</p></div>
+            <div class="flex flex-wrap gap-2"><button type="button" onclick="exportBackup()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--card-elevated);color:var(--ink-dark);min-height:40px">Exportar respaldo</button><button type="button" onclick="document.getElementById('backupImportInput').click()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--primary);color:var(--ink-dark);min-height:40px">Importar respaldo</button><input id="backupImportInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)"></div>
+        </section>
     </div>
 
     <!-- =================================================================
          MODAL RÁPIDO DE EDICIÓN DE HORARIO (PARA EDITAR O AGENDAR CON DETALLE)
     ================================================================== -->
-    <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <div id="scheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" onclick="handleScheduleModalBackdrop(event)">
         <div class="nouveau-frame activity-modal-panel max-w-lg w-full p-5 sm:p-7 relative">
             <button onclick="closeScheduleModal()" style="border-color: var(--border-ornament);" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:bg-white/10 absolute top-4 right-4">
                 ✕
@@ -667,7 +675,7 @@
         </div>
     </div>
 
-    <div id="choiceDialog" class="choice-overlay hidden" aria-modal="true" role="dialog"><div class="choice-panel"><h3 id="choiceDialogTitle" class="font-nouveau text-xl font-bold mb-2" style="color:var(--accent-gold)"></h3><p id="choiceDialogText" class="text-xs opacity-80 mb-4"></p><div id="choiceDialogOptions" class="grid gap-2"></div></div></div>
+    <div id="choiceDialog" class="choice-overlay hidden" aria-modal="true" role="dialog" onclick="handleChoiceDialogBackdrop(event)"><div class="choice-panel"><h3 id="choiceDialogTitle" class="font-nouveau text-xl font-bold mb-2" style="color:var(--accent-gold)"></h3><p id="choiceDialogText" class="text-xs opacity-80 mb-4"></p><div id="choiceDialogOptions" class="grid gap-2"></div></div></div>
 
     <!-- Notificación discreta estilo sello editorial -->
     <div id="statusToast" class="fixed bottom-5 right-5 z-50 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
@@ -756,12 +764,20 @@
         let currentUser = null;
         let cloudReady = false;
         let cloudSaveTimer = null;
+        let cloudSavePromise = null;
+        let lastCloudSyncedAt = null;
         let activeNotesTasksTab = 'notes';
         let weekOffset = 0;
         let focusedDayIndex = (new Date().getDay() + 6) % 7; // Al iniciar, abrir el día actual
         let inlineEditorState = null; // { dayIdx, hour } para edición directa en la fila horaria
         let lastShimmeryTaskId = null;
         let animateFocusedDay = true;
+        let scheduleModalOpener = null;
+        let scheduleModalFocusId = null;
+        let choiceDialogResolver = null;
+        let choiceDialogOpener = null;
+        let choiceDialogFocusId = null;
+        let nowLineInterval = null;
 
         let appState = {
             theme: 'complementarios',
@@ -861,14 +877,19 @@
 
             setColorTheme(appState.theme, false);
             renderAll();
+            requestAnimationFrame(() => scrollDailyTimeline(focusedDayIndex));
         }
+
+        function setSyncStatus(state){const el=document.getElementById('syncStatus');if(!el)return;const labels={ok:'Sincronizado',busy:'Sincronizando…',error:'Sin conexión / error'};el.dataset.state=state;el.textContent=labels[state]||'';}
 
         function saveState(showFeedback = true) {
             try {
+                appState.updatedAt = new Date().toISOString();
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
                 if (cloudReady && currentUser) {
                     clearTimeout(cloudSaveTimer);
-                    cloudSaveTimer = setTimeout(saveToCloud, 650);
+                    if (navigator.onLine === false) setSyncStatus('error');
+                    else { setSyncStatus('busy'); cloudSaveTimer = setTimeout(saveToCloud, 650); }
                 }
                 if (showFeedback) triggerToast('Cambios guardados en el grimorio');
             } catch (e) {
@@ -901,6 +922,7 @@
             inlineEditorState = null;
             animateFocusedDay = focusedDayIndex !== null;
             renderAll();
+            if (focusedDayIndex !== null) requestAnimationFrame(() => scrollDailyTimeline(focusedDayIndex));
             triggerToast(delta === 0 ? 'Semana actual' : 'Semana actualizada');
         }
 
@@ -920,7 +942,13 @@
             renderExLibrisNotes(weekData);
             renderPersonalTasks(weekData);
             updateGlobalProgress(weekData);
+            updateNowLine();
         }
+
+        function getFocusedDayDate(dayIdx=focusedDayIndex){const date=parseLocalISO(getMondayISO(weekOffset));date.setDate(date.getDate()+dayIdx);return date;}
+        function getTimeOffsetMinutes(date){return (date.getHours()*60+date.getMinutes())-(6*60+30);}
+        function scrollDailyTimeline(dayIdx=focusedDayIndex){if(dayIdx===null||dayIdx===undefined)return;const scroll=document.querySelector(`#day-col-${dayIdx} .timeline-scroll`);if(!scroll)return;const date=getFocusedDayDate(dayIdx);const today=localDateISO(new Date());let targetY;if(localDateISO(date)===today){targetY=Math.max(0,getTimeOffsetMinutes(new Date())/30*80-150);}else{const tasks=getActiveWeek().tasks[dayIdx]||[];const first=tasks.slice().sort((a,b)=>timeIndex(a.hour||'09:00')-timeIndex(b.hour||'09:00'))[0];const offset=first?timeIndex(first.hour||'09:00'):timeIndex('08:00');targetY=Math.max(0,offset*80-90);}scroll.scrollTo({top:targetY,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+        function updateNowLine(){document.querySelectorAll('.timeline-now-line').forEach(line=>line.remove());if(focusedDayIndex===null||focusedDayIndex===undefined)return;const date=getFocusedDayDate(focusedDayIndex);if(localDateISO(date)!==localDateISO(new Date()))return;const canvas=document.querySelector(`#day-col-${focusedDayIndex} .timeline-canvas`);if(!canvas)return;const line=document.createElement('div');line.className='timeline-now-line';const y=Math.max(0,Math.min((TIME_SLOTS.length-1)*80,getTimeOffsetMinutes(new Date())/30*80));line.style.top=`${y}px`;canvas.appendChild(line);}
 
         /* =====================================================================
            TOP 3 PRIORIDADES: DESPLAZAMIENTO HORIZONTAL SOLO SI EL TEXTO ES LARGO
@@ -1041,6 +1069,7 @@
             focusedDayIndex = idx;
             animateFocusedDay = idx !== null;
             renderAll();
+            if (idx !== null) requestAnimationFrame(() => scrollDailyTimeline(idx));
             if (idx === null) {
                 const container = document.getElementById('weekDaysContainer');
                 if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
@@ -1051,6 +1080,7 @@
             if (focusedDayIndex !== null) {
                 focusedDayIndex = dayIdx;
                 renderAll();
+                requestAnimationFrame(() => scrollDailyTimeline(dayIdx));
                 return;
             }
             const colEl = document.getElementById(`day-col-${dayIdx}`);
@@ -1073,7 +1103,11 @@
         function getAllSeriesOccurrences(seriesId){const found=[];Object.entries(appState.weeks).forEach(([wk,w])=>(w.tasks||[]).forEach((list,dayIdx)=>(list||[]).forEach(task=>{if(task.seriesId===seriesId){const d=parseLocalISO(wk);d.setDate(d.getDate()+dayIdx);found.push({weekKey:wk,dayIdx,task,date:localDateISO(d)});}})));return found.sort((a,b)=>a.date.localeCompare(b.date));}
         function findTask(dayIdx,taskId){const wk=getMondayISO(weekOffset);return (appState.weeks[wk]?.tasks?.[dayIdx]||[]).find(t=>t.id===taskId);}
         function getWeekForDate(date){const key=getMondayForDate(date);if(!appState.weeks[key])appState.weeks[key]=createDefaultWeekData();return {key,data:appState.weeks[key],dayIdx:(date.getDay()+6)%7};}
-        function showChoiceDialog(title,message,options){return new Promise(resolve=>{const root=document.getElementById('choiceDialog');document.getElementById('choiceDialogTitle').textContent=title;document.getElementById('choiceDialogText').textContent=message;const box=document.getElementById('choiceDialogOptions');box.innerHTML='';options.forEach(opt=>{const b=document.createElement('button');b.type='button';b.textContent=opt.label;b.onclick=()=>{root.classList.add('hidden');resolve(opt.value);};box.appendChild(b);});root.classList.remove('hidden');});}
+        function showChoiceDialog(title,message,options){if(choiceDialogResolver)closeChoiceDialog('cancel');return new Promise(resolve=>{const root=document.getElementById('choiceDialog');choiceDialogOpener=document.activeElement;choiceDialogFocusId=choiceDialogOpener?.id||null;choiceDialogResolver=resolve;document.getElementById('choiceDialogTitle').textContent=title;document.getElementById('choiceDialogText').textContent=message;const box=document.getElementById('choiceDialogOptions');box.innerHTML='';options.forEach(opt=>{const b=document.createElement('button');b.type='button';b.textContent=opt.label;b.onclick=()=>closeChoiceDialog(opt.value);box.appendChild(b);});root.classList.remove('hidden');box.querySelector('button')?.focus();});}
+        function closeChoiceDialog(value='cancel'){const root=document.getElementById('choiceDialog');if(root.classList.contains('hidden'))return;root.classList.add('hidden');const resolve=choiceDialogResolver;choiceDialogResolver=null;if(resolve)resolve(value);const opener=choiceDialogOpener;const focusId=choiceDialogFocusId;choiceDialogOpener=null;choiceDialogFocusId=null;requestAnimationFrame(()=>{const target=(focusId&&document.getElementById(focusId))||(opener?.isConnected?opener:null);target?.focus();});}
+        function handleChoiceDialogBackdrop(event){if(event.target===event.currentTarget)closeChoiceDialog('cancel');}
+        async function handleScheduleModalBackdrop(event){if(event.target!==event.currentTarget)return;const text=document.getElementById('modalTaskText').value.trim();if(text&&text!==scheduleModalInitialText){const choice=await showChoiceDialog('¿Descartar los cambios?','Escribiste texto en esta actividad. ¿Querés cerrar sin guardar?',[{label:'Seguir editando',value:'keep'},{label:'Descartar y cerrar',value:'discard'}]);if(choice!=='discard')return;}closeScheduleModal();}
+        function handleDialogEscape(event){if(event.key!=='Escape')return;const choice=document.getElementById('choiceDialog');if(choice&&!choice.classList.contains('hidden')){closeChoiceDialog('cancel');return;}const modal=document.getElementById('scheduleModal');if(modal&&!modal.classList.contains('hidden'))closeScheduleModal();}
         function setRepeatMode(mode){document.getElementById('repeatMode').value=mode;document.getElementById('repeatOnceBtn').classList.toggle('is-active',mode==='once');document.getElementById('repeatDaysBtn').classList.toggle('is-active',mode==='repeat');document.getElementById('repeatDaysPanel').classList.toggle('hidden',mode!=='repeat');updateRepeatPreview();}
         function getRepeatDays(){return [...document.querySelectorAll('#repeatDayChips button.is-active')].map(b=>Number(b.dataset.day));}
         function setRepeatPreset(which){const days=which==='all'?[0,1,2,3,4,5,6]:which==='weekdays'?[0,1,2,3,4]:[5,6];document.querySelectorAll('#repeatDayChips button').forEach(b=>b.classList.toggle('is-active',days.includes(Number(b.dataset.day))));updateRepeatPreview();}
@@ -1089,16 +1123,16 @@
                 if(focusedDayIndex===null&&window.matchMedia('(max-width: 767px)').matches){const mini=document.createElement('article');mini.className='nouveau-frame day-mini-card overflow-hidden';mini.innerHTML=`<button type="button" onclick="setFocusedDay(${dayIdx})" class="w-full h-full p-3 text-left" style="background:${dayIdx%2===0?'var(--primary)':'var(--secondary)'};color:var(--ink-dark);border:1px solid var(--accent-gold);"><div class="font-nouveau font-bold text-sm tracking-wide">${dayMeta.name}</div><div class="text-[10px] opacity-80 mt-1">${formatDayDate(mondayISO,dayIdx)}</div><div class="flex items-center gap-2 mt-3"><div class="flex-1 h-1.5 rounded-full bg-black/30 overflow-hidden"><div class="h-full" style="width:${dayPct}%;background:var(--accent-gold)"></div></div><span class="text-[9px] font-bold">${completedCount}/${dayTasks.length}</span></div><div class="text-[9px] mt-2 font-bold" style="color:var(--accent-gold)">Abrir jornada ↗</div></button>`;grid.appendChild(mini);return;}
                 const card=document.createElement('article');card.id=`day-col-${dayIdx}`;const colWidthClass=focusedDayIndex!==null?'w-full max-w-none h-[calc(100vh-220px)] min-h-[520px]':'w-[78vw] sm:w-[310px] md:w-[295px] lg:w-[285px] h-[590px] flex-shrink-0';card.className=`nouveau-frame day-expanded-card flex flex-col overflow-hidden ${colWidthClass}`;if(focusedDayIndex!==null&&animateFocusedDay)card.classList.add('day-open-animation');
                 const headerBg=dayIdx%2===0?'var(--primary)':'var(--secondary)';
-                let html=`<div style="background:${headerBg};color:var(--ink-dark);border-color:var(--accent-gold)" class="p-3 border-b-2 flex-shrink-0"><h3 class="day-heading">${dayMeta.name.toUpperCase()}</h3><div class="day-date-line">${formatDayDate(mondayISO,dayIdx)}</div><button type="button" onclick="openScheduleModal(${dayIdx},'09:00')" style="background:linear-gradient(135deg,var(--bg-paper-deep),var(--card-elevated));color:var(--ink-dark);border:1px solid var(--accent-gold);" class="day-add-activity mt-3 w-full rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 text-xs font-extrabold"><span style="color:var(--accent-gold);font-size:18px">＋</span> Agendar actividad</button><div class="mt-3 flex items-center gap-2"><div class="flex-1 h-1.5 bg-black/35 rounded-full overflow-hidden"><div style="width:${dayPct}%;background:var(--accent-gold)" class="h-full"></div></div><span class="text-[10px] font-bold">${completedCount}/${dayTasks.length}</span></div></div>`;
+                let html=`<div style="background:${headerBg};color:var(--ink-dark);border-color:var(--accent-gold)" class="p-3 border-b-2 flex-shrink-0"><h3 class="day-heading">${dayMeta.name.toUpperCase()}</h3><div class="day-date-line">${formatDayDate(mondayISO,dayIdx)}</div><button type="button" id="day-add-activity-${dayIdx}" onclick="openScheduleModal(${dayIdx},'09:00','',event.currentTarget)" style="background:linear-gradient(135deg,var(--bg-paper-deep),var(--card-elevated));color:var(--ink-dark);border:1px solid var(--accent-gold);" class="day-add-activity mt-3 w-full rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 text-xs font-extrabold"><span style="color:var(--accent-gold);font-size:18px">＋</span> Agendar actividad</button><div class="mt-3 flex items-center gap-2"><div class="flex-1 h-1.5 bg-black/35 rounded-full overflow-hidden"><div style="width:${dayPct}%;background:var(--accent-gold)" class="h-full"></div></div><span class="text-[10px] font-bold">${completedCount}/${dayTasks.length}</span></div></div>`;
                 html+='<div class="flex-1 overflow-y-auto timeline-scroll"><div class="timeline-canvas">';
                 TIME_SLOTS.slice(0,-1).forEach((slot,i)=>{const top=i*80;html+=`<div class="timeline-slot" style="top:${top}px" onclick="openInlineEditor(${dayIdx},'${slot}')"><span class="slot-time">${slot}</span><span class="text-[9px] opacity-0 hover:opacity-70">＋</span></div>`;});html+=`<div class="timeline-slot" style="top:${(TIME_SLOTS.length-1)*80}px" onclick="openInlineEditor(${dayIdx},'23:00')"><span class="slot-time">23:00</span></div>`;
                 const sorted=dayTasks.sort((a,b)=>timeIndex(a.hour||'09:00')-timeIndex(b.hour||'09:00'));const layouts=[];let group=[];let groupEnd=-1;
                 const placeGroup=items=>{if(!items.length)return;const laneEnds=[];const placed=items.map(item=>{let lane=laneEnds.findIndex(v=>v<=item.start);if(lane<0){lane=laneEnds.length;laneEnds.push(item.end);}else laneEnds[lane]=item.end;return {...item,lane};});const lanes=Math.max(1,laneEnds.length);placed.forEach(item=>layouts.push({...item,lanes}));};
                 sorted.forEach(task=>{const start=timeIndex(task.hour||'09:00');const end=Math.max(start+1,timeIndex(getTaskEnd(task)));if(group.length&&start>=groupEnd){placeGroup(group);group=[];groupEnd=-1;}group.push({task,start,end});groupEnd=Math.max(groupEnd,end);});placeGroup(group);
-                layouts.forEach(({task,start,end,lane,lanes})=>{const cat=CATEGORIES[task.category]||CATEGORIES.trabajo;const done=task.status==='done'||task.done;const missed=task.status==='missed';const height=Math.max(76,(end-start)*80-4);const left=`calc(50px + ${lane*100/lanes}% - ${lane*56/lanes}px)`;const width=`calc(${100/lanes}% - ${56/lanes+4}px)`;html+=`<div class="timeline-event ${done?'is-done':''} ${lanes>=2?'has-multiple-lanes':''}" style="top:${start*80+2}px;left:${left};width:${width};height:${height}px;border-left-color:${cat.color};background:linear-gradient(135deg,${cat.bg},var(--card-bg));" onclick="openScheduleModal(${dayIdx},'${task.hour||'09:00'}','${task.id}')"><div class="flex items-center justify-between gap-1"><span class="event-meta">${task.hour||'09:00'} – ${getTaskEnd(task)}</span><span style="color:${cat.color};font-size:10px;font-weight:800;white-space:nowrap">${escapeHtml(cat.icon)} ${escapeHtml(cat.label)}</span></div><div class="event-content flex items-center justify-between gap-1 min-w-0"><div class="event-text flex-1 ${done?'line-through':''} ${missed?'opacity-60':''}">${escapeHtml(task.text)}</div><div class="event-status flex-shrink-0" onclick="event.stopPropagation()"><button type="button" aria-label="Cumplida" class="${done?'active-done':''}" onclick="event.stopPropagation();setTaskStatus(${dayIdx},'${task.id}','done',this)">✓</button><button type="button" aria-label="No cumplida" class="${missed?'active-missed':''}" onclick="event.stopPropagation();setTaskStatus(${dayIdx},'${task.id}','missed',this)">✕</button></div></div></div>`;});
+                layouts.forEach(({task,start,end,lane,lanes})=>{const cat=CATEGORIES[task.category]||CATEGORIES.trabajo;const done=task.status==='done'||task.done;const missed=task.status==='missed';const height=Math.max(76,(end-start)*80-4);const left=`calc(50px + ${lane*100/lanes}% - ${lane*56/lanes}px)`;const width=`calc(${100/lanes}% - ${56/lanes+4}px)`;html+=`<div id="activity-card-${dayIdx}-${task.id}" class="timeline-event ${done?'is-done':''} ${lanes>=2?'has-multiple-lanes':''}" tabindex="0" role="group" aria-label="Actividad: ${escapeHtml(task.text)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openScheduleModal(${dayIdx},'${task.hour||'09:00'}','${task.id}',event.currentTarget)}" style="top:${start*80+2}px;left:${left};width:${width};height:${height}px;border-left-color:${cat.color};background:linear-gradient(135deg,${cat.bg},var(--card-bg));" onclick="openScheduleModal(${dayIdx},'${task.hour||'09:00'}','${task.id}',event.currentTarget)"><div class="flex items-center justify-between gap-1"><span class="event-meta">${task.hour||'09:00'} – ${getTaskEnd(task)}</span><span style="color:${cat.color};font-size:10px;font-weight:800;white-space:nowrap">${escapeHtml(cat.icon)} ${escapeHtml(cat.label)}</span></div><div class="event-content flex items-center justify-between gap-1 min-w-0"><div class="event-text flex-1 ${done?'line-through':''} ${missed?'opacity-60':''}">${escapeHtml(task.text)}</div><div class="event-status flex-shrink-0" onclick="event.stopPropagation()"><button type="button" aria-label="Cumplida" class="${done?'active-done':''}" onclick="event.stopPropagation();setTaskStatus(${dayIdx},'${task.id}','done',this)">✓</button><button type="button" aria-label="No cumplida" class="${missed?'active-missed':''}" onclick="event.stopPropagation();setTaskStatus(${dayIdx},'${task.id}','missed',this)">✕</button></div></div></div>`;});
                 if(inlineEditorState&&inlineEditorState.dayIdx===dayIdx){html+=`<div style="position:absolute;top:${timeIndex(inlineEditorState.hour)*80}px;left:50px;right:4px;z-index:5;background:var(--card-elevated);padding:8px;border:1px solid var(--accent-gold);border-radius:9px"><form onsubmit="saveInlineTask(event,${dayIdx},'${inlineEditorState.hour}')"><input id="inlineTaskInput" required placeholder="Escribí tu actividad" class="w-full p-2 rounded mb-2" style="background:var(--bg-paper-deep);color:var(--ink-dark)"><div class="grid grid-cols-2 gap-2 mb-2"><label class="text-[10px] font-bold">Desde<select id="inlineStartHour" onchange="adjustEndSelect('inlineStartHour','inlineEndHour')" class="w-full p-2 rounded text-xs" style="background:var(--bg-paper-deep);color:var(--ink-dark)">${TIME_SLOTS.slice(timeIndex(inlineEditorState.hour)).map(v=>`<option value="${v}" ${v===inlineEditorState.hour?'selected':''}>${v}</option>`).join('')}</select></label><label class="text-[10px] font-bold">Hasta<select id="inlineEndHour" class="w-full p-2 rounded text-xs" style="background:var(--bg-paper-deep);color:var(--ink-dark)">${validEndSlots(inlineEditorState.hour).map(v=>`<option value="${v}" ${v===nextTimeSlot(inlineEditorState.hour)?'selected':''}>${v}</option>`).join('')}</select></label></div><div class="grid grid-cols-2 gap-2"><select id="inlineTaskCategory" class="p-2 rounded text-xs" style="background:var(--bg-paper-deep);color:var(--ink-dark)">${Object.entries(CATEGORIES).map(([k,v])=>`<option value="${k}">${escapeHtml(v.icon)} ${escapeHtml(v.label)}</option>`).join('')}</select><button type="submit" class="font-bold rounded" style="background:var(--primary);color:var(--ink-dark);min-height:40px">Guardar</button></div><div class="flex justify-end mt-1"><button type="button" onclick="closeInlineEditor()" class="text-xs">Cancelar</button></div></form></div>`;}
                 html+='</div></div>';card.innerHTML=html;grid.appendChild(card);
-            });animateFocusedDay=false;if(inlineEditorState){const inp=document.getElementById('inlineTaskInput');if(inp)inp.focus();}
+            });animateFocusedDay=false;if(inlineEditorState){const inp=document.getElementById('inlineTaskInput');if(inp)inp.focus();}updateNowLine();
         }
 
         function openInlineEditor(dayIdx, hour) {
@@ -1131,14 +1165,17 @@
         /* =====================================================================
            MODAL DE EDICIÓN DE HORARIO / CATEGORÍA
         ===================================================================== */
-        function openScheduleModal(dayIdx,defaultHour='09:00',taskId=''){
+        let scheduleModalInitialText='';
+        function openScheduleModal(dayIdx,defaultHour='09:00',taskId='',opener=null){
+            scheduleModalOpener=opener||document.activeElement;
+            scheduleModalFocusId=scheduleModalOpener?.id||null;
             inlineEditorState=null;const week=getActiveWeek();document.getElementById('modalDayIndex').value=dayIdx;document.getElementById('modalTaskId').value=taskId;
             let selectedCat='trabajo',existing=null;if(taskId){existing=week.tasks[dayIdx].find(t=>t.id===taskId);if(existing){document.getElementById('modalTaskText').value=existing.text;defaultHour=existing.hour||defaultHour;selectedCat=existing.category||'trabajo';}}
             populateTimeSelect(document.getElementById('modalHourSelect'),defaultHour);const endSelect=document.getElementById('modalEndHourSelect');populateEndSelect(endSelect,defaultHour,existing?.endHour||nextTimeSlot(defaultHour));
             document.getElementById('modalTitle').textContent=taskId?'Editar actividad':'Agendar actividad';document.getElementById('modalDeleteBtn').classList.toggle('hidden',!taskId);if(!taskId)document.getElementById('modalTaskText').value='';
             document.getElementById('modalSubtitle').textContent=`${DAYS_CONFIG[dayIdx].name} · ${formatDayDate(getMondayISO(weekOffset),dayIdx)}`;renderModalCategories(selectedCat);
             const repeat=document.getElementById('repeatOptions');repeat.classList.toggle('hidden',!!taskId);if(!taskId){document.getElementById('repeatMode').value='once';setRepeatMode('once');document.getElementById('repeatUntil').value='week';initializeRepeatChips(dayIdx);updateRepeatPreview();}
-            const modal=document.getElementById('scheduleModal');modal.classList.remove('hidden');modal.classList.add('flex');setTimeout(()=>document.getElementById('modalTaskText').focus(),40);
+            scheduleModalInitialText=document.getElementById('modalTaskText').value;const modal=document.getElementById('scheduleModal');modal.classList.remove('hidden');modal.classList.add('flex');setTimeout(()=>document.getElementById('modalTaskText').focus(),40);
         }
 
         async function deleteTaskFromModal(){const dayIdx=Number(document.getElementById('modalDayIndex').value);const taskId=document.getElementById('modalTaskId').value;if(!taskId)return;closeScheduleModal();await deleteTask(dayIdx,taskId);}
@@ -1147,6 +1184,8 @@
             const modal = document.getElementById('scheduleModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            const opener=scheduleModalOpener;const focusId=scheduleModalFocusId;const fallbackId=`day-add-activity-${document.getElementById('modalDayIndex').value}`;scheduleModalOpener=null;scheduleModalFocusId=null;
+            requestAnimationFrame(()=>{const target=(focusId&&document.getElementById(focusId))||(opener?.isConnected?opener:null)||document.getElementById(fallbackId);target?.focus();});
         }
 
         function renderModalCategories(activeKey) {
@@ -1456,32 +1495,54 @@
                 .replace(/'/g, '&#039;');
         }
 
+        function exportBackup(){const json=JSON.stringify(appState,null,2);const url=URL.createObjectURL(new Blob([json],{type:'application/json;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=`organizador-respaldo-${localDateISO(new Date())}.json`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+        function validateBackupState(value){if(!value||typeof value!=='object'||Array.isArray(value)||!value.weeks||typeof value.weeks!=='object'||Array.isArray(value.weeks))return false;return Object.values(value.weeks).every(week=>{if(!week||typeof week!=='object'||Array.isArray(week))return false;if(week.tasks!==undefined&&(!Array.isArray(week.tasks)||week.tasks.some(day=>day!==undefined&&!Array.isArray(day))))return false;return true;});}
+        async function importBackupFile(event){const input=event.currentTarget;const file=input.files?.[0];input.value='';if(!file)return;try{const backup=JSON.parse(await file.text());if(!validateBackupState(backup)){triggerToast('El archivo no tiene una estructura de respaldo válida');return;}const choice=await showChoiceDialog('¿Importar este respaldo?','Esto reemplazará todos los datos actuales y sincronizará el respaldo con Supabase.',[{label:'Cancelar',value:'cancel'},{label:'Reemplazar datos',value:'replace'}]);if(choice!=='replace')return;localStorage.setItem(STORAGE_KEY,JSON.stringify(backup));appState=backup;initializePlanner();clearTimeout(cloudSaveTimer);const synced=await saveToCloud();triggerToast(synced?'Respaldo importado y sincronizado':'Respaldo importado localmente; falta sincronizar');}catch(error){console.error('Error importando respaldo:',error);triggerToast('No se pudo importar el respaldo');}}
+
         async function saveToCloud() {
             if (!cloudReady || !currentUser) return;
-            const { error } = await supabaseClient.from('planner_data').upsert({
-                user_id: currentUser.id,
-                data: appState,
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
-            if (error) console.error('Error sincronizando con Supabase:', error.message);
+            if (navigator.onLine === false) { setSyncStatus('error'); return false; }
+            if(cloudSavePromise){const previousResult=await cloudSavePromise;if(!previousResult)return false;if(appState.updatedAt!==lastCloudSyncedAt)return saveToCloud();return true;}
+            setSyncStatus('busy');
+            let snapshot,updatedAt;
+            try{snapshot=JSON.parse(JSON.stringify(appState));updatedAt=snapshot.updatedAt||new Date().toISOString();}catch(error){console.error('Error preparando sincronización:',error);setSyncStatus('error');return false;}
+            const operation=(async()=>{
+            try{
+                const { error } = await supabaseClient.from('planner_data').upsert({
+                    user_id: currentUser.id,
+                    data: snapshot,
+                    updated_at: updatedAt
+                }, { onConflict: 'user_id' });
+                if(error)throw error;
+                lastCloudSyncedAt=updatedAt;
+                if(appState.updatedAt===updatedAt)setSyncStatus('ok');
+                return true;
+            }catch(error){console.error('Error sincronizando con Supabase:',error.message||error);setSyncStatus('error');return false;}
+            })();
+            cloudSavePromise=operation;
+            const result=await operation;
+            if(cloudSavePromise===operation)cloudSavePromise=null;
+            if(result&&appState.updatedAt!==updatedAt)return saveToCloud();
+            return result;
         }
 
         async function loadCloudAndStart(user) {
             currentUser = user;
-            const { data, error } = await supabaseClient.from('planner_data').select('data').eq('user_id', user.id).maybeSingle();
+            let localState=null;
+            try{const local=localStorage.getItem(STORAGE_KEY);if(local)localState=JSON.parse(local);}catch(error){console.warn('No se pudo leer el respaldo local:',error);}
+            const { data, error } = await supabaseClient.from('planner_data').select('data,updated_at').eq('user_id', user.id).maybeSingle();
             if (error) throw error;
-            if (data?.data && typeof data.data === 'object') {
-                appState = data.data;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-            } else {
-                try {
-                    const local = localStorage.getItem(STORAGE_KEY);
-                    if (local) appState = JSON.parse(local);
-                } catch (_) {}
-            }
+            const cloudState=data?.data&&typeof data.data==='object'?data.data:null;
+            const localTimestamp=Date.parse(localState?.updatedAt||'')||0;
+            const cloudTimestamp=Date.parse(data?.updated_at||cloudState?.updatedAt||'')||0;
+            if(localState&&(!cloudState||localTimestamp>cloudTimestamp)){appState=localState;}
+            else if(cloudState){appState=cloudState;if(!appState.updatedAt&&data.updated_at)appState.updatedAt=data.updated_at;}
+            else if(localState)appState=localState;
+            localStorage.setItem(STORAGE_KEY,JSON.stringify(appState));
             cloudReady = true;
             document.getElementById('authGate').classList.add('hidden');
             initializePlanner();
+            clearTimeout(cloudSaveTimer);
             await saveToCloud();
         }
 
@@ -1526,6 +1587,10 @@
             document.getElementById('authGate').classList.remove('hidden');
             document.getElementById('loginError').textContent = 'No se pudo verificar la sesión. Revisá tu conexión e intentá nuevamente.';
         }));
+        document.addEventListener('keydown',handleDialogEscape);
+        window.addEventListener('online',()=>{if(cloudReady&&currentUser)saveToCloud();});
+        window.addEventListener('offline',()=>{if(cloudReady&&currentUser)setSyncStatus('error');});
+        window.addEventListener('DOMContentLoaded',()=>{if(nowLineInterval)clearInterval(nowLineInterval);nowLineInterval=setInterval(updateNowLine,60000);});
         window.addEventListener('resize', () => {
             const weekData = getActiveWeek();
             if (!weekData || !weekData.priorities) return;
