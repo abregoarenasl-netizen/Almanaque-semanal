@@ -354,8 +354,8 @@
             .day-jump-panel > .day-filter-btn, #dayQuickJumpButtons .day-filter-btn { min-width:0; width:100%; min-height:34px; padding:6px 4px; }
             #weekDaysContainer { overflow:visible !important; padding-bottom:0; }
             #weekDaysGrid { display:grid !important; grid-template-columns:minmax(0,1fr) !important; width:100% !important; gap:13px !important; }
-            #weekDaysGrid > article { width:100% !important; max-width:none !important; height:auto !important; min-height:0 !important; }
-            #weekDaysGrid > article .timeline-scroll { flex:initial !important; max-height:52vh; overflow-y:auto; }
+            #weekDaysGrid:not(.is-compact) > article { width:100% !important; max-width:none !important; height:auto !important; min-height:0 !important; }
+            #weekDaysGrid:not(.is-compact) > article .timeline-scroll { flex:initial !important; max-height:52vh; overflow-y:auto; }
             .day-heading { font-size:clamp(1.2rem,6vw,1.65rem) !important; letter-spacing:.035em; }
             .day-date-line { font-size:10px; letter-spacing:.12em; }
             .day-add-activity { font-size:12px; min-height:44px; }
@@ -384,27 +384,76 @@
             #dayQuickJumpButtons .day-filter-btn .day-filter-date { font-size:9px; opacity:.82; line-height:1.1; }
             #weekDaysContainer { overflow:visible !important; }
             #weekDaysGrid { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; width:100% !important; gap:9px !important; }
-            #weekDaysGrid > article { width:100% !important; min-width:0 !important; }
-            #weekDaysGrid > article.day-mini-card { height:auto !important; min-height:112px !important; cursor:pointer; }
-            #weekDaysGrid > article.day-mini-card .day-mini-open { display:block; }
-            #weekDaysGrid > article.day-expanded-card { grid-column:1 / -1; height:calc(100dvh - 255px) !important; min-height:440px !important; animation:dayReveal .48s cubic-bezier(.16,1,.3,1) both; }
-            #weekDaysGrid > article.day-expanded-card .timeline-scroll { flex:1 1 auto !important; min-height:0; max-height:none !important; overflow-y:auto; }
+            #weekDaysGrid:not(.is-compact) > article { width:100% !important; min-width:0 !important; }
+            #weekDaysGrid:not(.is-compact) > article.day-mini-card { height:auto !important; min-height:112px !important; cursor:pointer; }
+            #weekDaysGrid:not(.is-compact) > article.day-mini-card .day-mini-open { display:block; }
+            #weekDaysGrid:not(.is-compact) > article.day-expanded-card { grid-column:1 / -1; height:calc(100dvh - 255px) !important; min-height:440px !important; animation:dayReveal .48s cubic-bezier(.16,1,.3,1) both; }
+            #weekDaysGrid:not(.is-compact) > article.day-expanded-card .timeline-scroll { flex:1 1 auto !important; min-height:0; max-height:none !important; overflow-y:auto; }
             .mobile-week-toggle { display:none; grid-column:1 / -1; width:100%; min-height:34px; border:1px solid var(--accent-gold); border-radius:9px; color:var(--accent-gold); background:var(--card-elevated); font:700 11px Georgia,serif; letter-spacing:.04em; }
         }
         /* Tablet: dos columnas amplias, sin desbordes laterales */
         @media (min-width: 768px) and (max-width: 1199px) {
             #weekDaysGrid { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; width:100% !important; gap:14px !important; }
             #weekDaysContainer { overflow:visible !important; }
-            #weekDaysGrid > article { width:100% !important; max-width:none !important; height:590px; }
+            #weekDaysGrid:not(.is-compact) > article { width:100% !important; max-width:none !important; height:590px; }
         }
         /* Escritorio: cada jornada ocupa el ancho disponible, no una tarjeta angosta */
         @media (min-width: 1200px) {
             #weekDaysContainer { overflow:visible !important; }
             #weekDaysGrid { display:grid !important; grid-template-columns:minmax(0,1fr) !important; width:100% !important; gap:18px !important; }
-            #weekDaysGrid > article { width:100% !important; max-width:none !important; height:calc(100vh - 245px) !important; min-height:620px; }
-            #weekDaysGrid > article .timeline-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; }
+            #weekDaysGrid:not(.is-compact) > article { width:100% !important; max-width:none !important; height:calc(100vh - 245px) !important; min-height:620px; }
+            #weekDaysGrid:not(.is-compact) > article .timeline-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; }
         }
         @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
+        .priority-status-group{gap:0}
+        .priority-status-btn{width:36px;height:36px;min-width:36px;border:0!important;border-radius:50%;padding:8px;background:transparent!important;font-size:18px;line-height:1;color:var(--ink-muted);opacity:.48;box-shadow:none!important}
+        .priority-status-btn.is-done{color:var(--primary);text-shadow:0 0 8px var(--aura-glow);opacity:1}
+        .priority-status-btn.is-missed{color:var(--secondary);text-shadow:0 0 8px var(--aura-glow);opacity:1}
+        .theme-options{display:flex;gap:8px;overflow-x:auto;padding:1px;scrollbar-width:thin}
+        .themes-compact-row{padding:9px 12px!important;display:flex;align-items:center;gap:14px}
+        .themes-compact-row h2{font-size:16px;margin:0;white-space:nowrap}
+        .theme-option{min-height:44px!important;height:44px!important;flex:1 0 auto;min-width:128px;padding:5px 11px!important;display:flex;flex-direction:row;gap:7px;border-radius:999px}
+        .theme-option .theme-emoji{display:none}
+        .theme-option .theme-name{font-size:12px;white-space:nowrap}
+        .theme-option .theme-swatches{gap:3px}
+        .theme-option .theme-swatches i{width:9px;height:9px}
+        .theme-option .theme-check{position:static;opacity:0;font-size:12px}
+        .theme-option.is-active .theme-check{opacity:1}
+        .compact-week-card{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-height:100%;overflow:hidden;border-radius:15px;display:flex;flex-direction:column}
+        .compact-week-head{width:100%;min-height:54px;text-align:left;padding:8px 11px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px 8px;background:var(--card-elevated);color:var(--ink-dark);border:0}
+        .compact-day-name{font:700 13px 'Playfair Display',Georgia,serif;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .today-mark{color:var(--accent-gold);margin-left:5px;text-shadow:0 0 9px var(--aura-glow)}
+        .compact-count{font-size:10px;color:var(--ink-muted);white-space:nowrap}
+        .compact-progress{grid-column:1/-1;height:4px;background:color-mix(in srgb,var(--ink-muted) 24%,transparent);border-radius:9px;overflow:hidden}
+        .compact-progress i{height:100%;display:block;background:var(--accent-gold)}
+        .compact-week-card.is-today{border-color:var(--accent-gold);box-shadow:0 0 12px var(--aura-glow)}
+        .compact-week-content{max-height:330px;min-height:0;flex:1 1 0;display:flex;flex-direction:column;overflow:hidden;transition:max-height .28s ease,opacity .2s ease;opacity:1}
+        .compact-week-content[hidden]{display:flex!important;max-height:0;opacity:0;overflow:hidden;pointer-events:none}
+        .compact-task-list{overflow-y:auto;min-height:0;max-height:180px;flex:1 1 0;padding:4px 7px;scrollbar-width:thin;scrollbar-color:var(--accent-gold) var(--bg-paper-deep)}
+        .compact-task-row{display:grid;grid-template-columns:7px auto minmax(0,1fr) auto;align-items:center;gap:6px;width:100%;min-height:40px;text-align:left;background:transparent;border:0;border-bottom:1px solid color-mix(in srgb,var(--border-ornament) 25%,transparent);color:var(--ink-dark)}
+        .compact-category-dot{width:6px;height:6px;border-radius:50%}
+        .compact-task-time{font-size:9px;color:var(--ink-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+        .compact-task-title{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .compact-task-status{font-size:12px;font-weight:900;color:var(--ink-muted)}.compact-task-status.is-done{color:var(--primary)}.compact-task-status.is-missed{color:var(--secondary)}
+        .compact-empty{padding:9px;font-size:10px;color:var(--ink-muted)}
+        .compact-week-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:7px;flex:0 0 auto;margin-top:auto}
+        .compact-week-actions button,.choice-action{min-height:40px;padding:6px 8px;border-radius:9px;border:1px solid var(--border-ornament);background:var(--card-elevated);color:var(--ink-dark);font-size:10px;font-weight:800}
+        .compact-week-actions .compact-add{background:var(--primary)}
+        .return-day-btn{min-height:40px;border:1px solid var(--accent-gold);border-radius:10px;background:var(--card-elevated);color:var(--accent-gold);padding:6px 12px;font-weight:800}
+        #weekDaysGrid.is-compact{display:grid!important;width:100%!important;gap:9px;grid-template-columns:1fr!important}
+        .add-category-button{margin-top:8px;width:100%;min-height:40px;border:1px dashed var(--accent-gold);border-radius:10px;background:var(--card-elevated);color:var(--accent-gold);font-weight:800;font-size:11px}
+        .category-editor-input{display:block;width:100%;margin-top:5px;padding:9px;border:1px solid var(--border-ornament);border-radius:9px;background:var(--card-elevated);color:var(--ink-dark)}
+        .category-color-preview-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:11px;color:var(--ink-muted)}.category-color-preview-row i{width:22px;height:22px;border-radius:50%;border:1px solid var(--border-ornament);box-shadow:0 0 9px var(--aura-glow)}
+        #backToTopButton{position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:40;width:40px;height:40px;border-radius:50%;border:1px solid var(--accent-gold);background:var(--card-elevated);color:var(--accent-gold);font-size:20px;font-weight:900;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+        #backToTopButton.is-visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+        .compact-week-content.is-collapsed{max-height:0;opacity:0;overflow:hidden;pointer-events:none}
+        #weekDaysGrid.is-compact > article.compact-week-card{height:100%!important;min-height:0!important;max-height:100%;overflow:hidden}
+        .return-day-btn.hidden{display:none}
+        @media(min-width:768px){#weekDaysGrid.is-compact{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,calc((100vh - 270px)/2)));grid-auto-rows:minmax(0,calc((100vh - 270px)/2))}.compact-week-content{max-height:none!important;flex:1}.compact-week-card{height:100%!important;min-height:0!important}.compact-task-list{max-height:180px}.return-day-btn{display:inline-block}}
+        @media(min-width:1600px){#weekDaysGrid.is-compact{grid-template-columns:repeat(7,minmax(0,1fr))!important;grid-template-rows:minmax(0,calc(100vh - 290px));grid-auto-rows:minmax(0,calc(100vh - 290px))}.compact-task-list{max-height:180px}}
+        @media(max-width:767px){.themes-compact-row{padding:8px!important;display:block}.themes-compact-row h2{font-size:14px;margin:0 0 5px}.theme-options{width:100%;gap:5px}.theme-option{flex:0 0 auto;min-width:max-content!important;min-height:44px!important;height:44px!important;padding:4px 8px!important;font-size:10px}.theme-option .theme-name{font-size:10px}.theme-option .theme-swatches{display:flex}.backup-section{padding:8px!important;gap:6px!important}.backup-section h2{font-size:13px!important}.backup-section p:not(#accountEmail){display:none}.backup-section #accountEmail{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px}.backup-section>div:last-child{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:5px}.backup-section button{min-width:0;min-height:36px!important;height:36px;padding:4px 3px!important;font-size:10px!important;white-space:nowrap}.compact-week-card{min-height:0}.compact-week-head{min-height:54px}.compact-week-content{max-height:320px}#backToTopButton{bottom:calc(76px + env(safe-area-inset-bottom))}}
+        @media(max-width:767px){#themeOptions{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;overflow:visible}#themeOptions .theme-option{width:100%;min-width:0!important;flex:none;display:grid!important;grid-template-columns:10px minmax(0,1fr);grid-template-rows:24px 7px;align-content:center;gap:0;padding:2px 3px!important;min-height:44px!important;height:44px!important;border-radius:11px}#themeOptions .theme-check{grid-column:1;grid-row:1;position:static;transform:none;opacity:0;font-size:10px;line-height:1}#themeOptions .theme-option.is-active .theme-check{opacity:1}#themeOptions .theme-name{grid-column:2;grid-row:1;min-width:0;font-size:11px!important;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}#themeOptions .theme-swatches{grid-column:1/-1;grid-row:2;justify-content:center;gap:4px}#themeOptions .theme-swatches i{width:6px;height:6px;border:0}}
+        @media(prefers-reduced-motion:reduce){#backToTopButton,.compact-week-content{transition:none!important}}
     </style>
 </head>
 <body class="p-3 sm:p-5 lg:p-7" data-theme="complementarios">
@@ -449,12 +498,12 @@
             <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_25rem] xl:items-center gap-5 px-2 sm:px-4">
                 <!-- Encabezado editorial del organizador -->
                 <div class="space-y-2 flex-1 py-2 text-center xl:text-left">
-                    <div class="font-display text-3xl sm:text-4xl lg:text-5xl font-black tracking-wide leading-tight" style="color:var(--accent-gold); text-shadow:0 2px 18px var(--aura-glow);">
-                        Organizador semanal
-                    </div>
-                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-3 justify-center xl:justify-start">
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2 justify-center xl:justify-start">
                         <span id="weekDatesLabel" class="font-nouveau text-lg sm:text-xl tracking-wide" style="color:var(--ink-muted);">Cargando fechas...</span>
                         <span id="syncStatus" class="text-[11px] font-bold" role="status" aria-live="polite"></span>
+                    </div>
+                    <div class="font-display text-3xl sm:text-4xl lg:text-5xl font-black tracking-wide leading-tight" style="color:var(--accent-gold); text-shadow:0 2px 18px var(--aura-glow);">
+                        Organizador semanal
                     </div>
                 </div>
 
@@ -515,6 +564,7 @@
                     <button onclick="setFocusedDay(null)" id="focus-btn-all" class="day-filter-btn">Todos</button>
                     <div id="dayQuickJumpButtons" class="flex flex-wrap gap-1"></div>
                     <button type="button" class="mobile-week-toggle hidden" onclick="setFocusedDay(null)">✧ Ver semana completa</button>
+                    <button type="button" id="returnToDayButton" class="return-day-btn hidden" onclick="setFocusedDay(dayBeforeWeekView)">← Volver al día</button>
                 </div>
             </div>
 
@@ -616,13 +666,9 @@
 
         <section class="nouveau-frame themes-compact-row" aria-label="Temas">
             <h2 class="font-nouveau font-bold">Temas</h2>
-            <div class="theme-options">
-                <button type="button" onclick="setColorTheme('complementarios')" id="btn-theme-complementarios" title="Medianoche" aria-label="Tema Medianoche" aria-pressed="false" class="nouveau-btn theme-option" data-theme-choice="complementarios"><span class="theme-check">✓</span><span class="theme-emoji">🌌</span><span class="theme-name">Medianoche</span><span class="theme-swatches" data-theme="complementarios"><i style="background:var(--primary)"></i><i style="background:var(--secondary)"></i><i style="background:var(--accent-gold)"></i></span></button>
-                <button type="button" onclick="setColorTheme('triada')" id="btn-theme-triada" title="Tríada" aria-label="Tema Tríada" aria-pressed="false" class="nouveau-btn theme-option" data-theme-choice="triada"><span class="theme-check">✓</span><span class="theme-emoji">🌺</span><span class="theme-name">Tríada</span><span class="theme-swatches" data-theme="triada"><i style="background:var(--primary)"></i><i style="background:var(--secondary)"></i><i style="background:var(--accent-gold)"></i></span></button>
-                <button type="button" onclick="setColorTheme('analogos')" id="btn-theme-analogos" title="Botánico" aria-label="Tema Botánico" aria-pressed="false" class="nouveau-btn theme-option" data-theme-choice="analogos"><span class="theme-check">✓</span><span class="theme-emoji">🌿</span><span class="theme-name">Botánico</span><span class="theme-swatches" data-theme="analogos"><i style="background:var(--primary)"></i><i style="background:var(--secondary)"></i><i style="background:var(--accent-gold)"></i></span></button>
-            </div>
+            <div class="theme-options" id="themeOptions"></div>
         </section>
-        <section class="nouveau-frame p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" aria-label="Respaldo">
+        <section class="nouveau-frame backup-section p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" aria-label="Respaldo">
             <div><h2 class="font-nouveau text-lg font-bold">Respaldo y sesión</h2><p class="text-[10px] opacity-65 mt-1">Guardá o restaurá tus datos del organizador.</p><p id="accountEmail" class="text-[10px] opacity-70 mt-1"></p></div>
             <div class="flex flex-wrap gap-2"><button type="button" onclick="exportBackup()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--card-elevated);color:var(--ink-dark);min-height:40px">Exportar respaldo</button><button type="button" onclick="document.getElementById('backupImportInput').click()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--primary);color:var(--ink-dark);min-height:40px">Importar respaldo</button><button type="button" onclick="signOutUser()" class="nouveau-btn px-4 py-2 text-xs" style="background:var(--card-bg);color:var(--ink-muted);min-height:40px">Cerrar sesión</button><input id="backupImportInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)"></div>
         </section>
@@ -636,7 +682,7 @@
             <button onclick="closeScheduleModal()" style="border-color: var(--border-ornament);" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:bg-white/10 absolute top-4 right-4">
                 ✕
             </button>
-            <div class="mb-5 pr-8"><div class="text-[10px] uppercase tracking-[.24em] font-extrabold mb-1" style="color:var(--accent-gold);">✦ Organizador personal</div><h3 id="modalTitle" class="font-display text-2xl sm:text-3xl font-bold">Agendar actividad</h3></div>
+            <div class="mb-5 pr-8"><h3 id="modalTitle" class="font-display text-2xl sm:text-3xl font-bold">Agendar actividad</h3></div>
             <p id="modalSubtitle" class="text-xs font-semibold opacity-75 mb-4">Día seleccionado</p>
 
             <form onsubmit="submitScheduleModal(event)" class="space-y-4">
@@ -662,12 +708,13 @@
                 <div id="repeatOptions" class="space-y-3 hidden rounded-xl border p-3" style="border-color:var(--border-ornament);background:var(--card-elevated);">
                     <div class="flex flex-wrap gap-2"><label class="text-xs font-bold w-full">Frecuencia</label><button type="button" id="repeatOnceBtn" class="repeat-chip is-active" onclick="setRepeatMode('once')">Agendar 1 vez</button><button type="button" id="repeatDaysBtn" class="repeat-chip" onclick="setRepeatMode('repeat')">Repetir en días específicos</button></div>
                     <div id="repeatDaysPanel" class="hidden space-y-2"><div class="flex flex-wrap gap-1.5" id="repeatDayChips"></div><div class="flex flex-wrap gap-1.5"><button type="button" class="repeat-chip" onclick="setRepeatPreset('all')">Todos</button><button type="button" class="repeat-chip" onclick="setRepeatPreset('weekdays')">Lun a Vie</button><button type="button" class="repeat-chip" onclick="setRepeatPreset('weekend')">Fin de semana</button></div>
-                    <label class="block text-xs font-bold" for="repeatUntil">¿Hasta cuándo?</label><select id="repeatUntil" class="w-full rounded-lg border px-3 py-2 text-sm" style="background:var(--bg-paper-deep);border-color:var(--border-ornament);color:var(--ink-dark);" onchange="updateRepeatPreview()"><option value="week">Solo esta semana</option><option value="rest">Resto del mes</option><option value="month">Todo el mes</option></select><p id="repeatPreview" class="text-xs font-bold" style="color:var(--accent-gold);">Se crearán 1 actividades</p></div>
+                    <label class="block text-xs font-bold" for="repeatUntil">¿Hasta cuándo?</label><select id="repeatUntil" class="w-full rounded-lg border px-3 py-2 text-sm" style="background:var(--bg-paper-deep);border-color:var(--border-ornament);color:var(--ink-dark);" onchange="updateRepeatPreview()"><option value="week">Solo esta semana</option><option value="month">Todo el mes</option></select><p id="repeatPreview" class="text-xs font-bold" style="color:var(--accent-gold);">Se crearán 1 actividades</p></div>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-bold tracking-wider mb-1.5">Categoría</label>
                     <div id="modalCategorySelector" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5"></div>
+                    <button type="button" id="addCategoryButton" class="add-category-button" onclick="addCategory()">＋ Agregar categoría</button>
                     <p class="text-[10px] opacity-60 mt-2">Podés personalizar el nombre y el símbolo de cada categoría desde ✎ Editar.</p>
                     <input type="hidden" id="modalCategoryValue" value="trabajo" />
                 </div>
@@ -686,6 +733,9 @@
     </div>
 
     <div id="choiceDialog" class="choice-overlay hidden" aria-modal="true" role="dialog" onclick="handleChoiceDialogBackdrop(event)"><div class="choice-panel"><h3 id="choiceDialogTitle" class="font-nouveau text-xl font-bold mb-2" style="color:var(--accent-gold)"></h3><p id="choiceDialogText" class="text-xs opacity-80 mb-4"></p><div id="choiceDialogOptions" class="grid gap-2"></div></div></div>
+    <div id="categoryEditor" class="choice-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="categoryEditorTitle" onclick="if(event.target===this)closeCategoryEditor()"><div class="choice-panel"><h3 id="categoryEditorTitle" class="font-nouveau text-xl font-bold mb-3" style="color:var(--accent-gold)">Editar categoría</h3><label for="categoryEditorName" class="text-xs font-bold">Nombre</label><input id="categoryEditorName" class="category-editor-input" maxlength="22"><label for="categoryEditorIcon" class="text-xs font-bold mt-3 block">Ícono ornamental</label><input id="categoryEditorIcon" class="category-editor-input" maxlength="3"><div class="category-color-preview-row"><span>Color asignado</span><i id="categoryEditorColorPreview"></i></div><div class="flex flex-wrap gap-2 mt-3"><button type="button" class="choice-action" onclick="rerollCategory()">Sortear otro color e ícono</button><button type="button" id="removeCategoryButton" class="choice-action" onclick="removeCategory()">Quitar</button></div><div class="grid grid-cols-2 gap-2 mt-4"><button type="button" class="choice-action" onclick="closeCategoryEditor()">Cancelar</button><button type="button" class="choice-action" onclick="saveCategoryEditor()">Guardar</button></div></div></div>
+    <div id="categoryMoveDialog" class="choice-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="categoryMoveTitle" onclick="if(event.target===this)closeCategoryMoveDialog()"><div class="choice-panel"><h3 id="categoryMoveTitle" class="font-nouveau text-xl font-bold mb-2" style="color:var(--accent-gold)"></h3><p id="categoryMoveText" class="text-xs opacity-80 mb-3"></p><select id="categoryMoveTarget" class="category-editor-input"></select><div class="grid grid-cols-2 gap-2 mt-4"><button type="button" class="choice-action" onclick="closeCategoryMoveDialog()">Cancelar</button><button type="button" class="choice-action" onclick="confirmCategoryMove()">Mover y quitar</button></div></div></div>
+    <button type="button" id="backToTopButton" aria-label="Volver arriba" onclick="scrollPageToTop()">↑</button>
 
     <!-- Notificación discreta estilo sello editorial -->
     <div id="statusToast" class="fixed bottom-5 right-5 z-50 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
@@ -710,7 +760,7 @@
         ];
 
         // Categorías con paletas oscuras profundas y contrastadas para modo nocturno
-        let CATEGORIES = {
+        const LEGACY_CATEGORY_META = {
             trabajo: { label: 'Trabajo', color: '#6BA2DC', bg: 'rgba(59, 111, 166, 0.24)', icon: '✒' },
             personal: { label: 'Personal', color: '#6CC2A4', bg: 'rgba(74, 139, 116, 0.24)', icon: '❧' },
             creativo: { label: 'Creativo', color: '#E3B962', bg: 'rgba(212, 163, 73, 0.22)', icon: '✧' },
@@ -724,8 +774,10 @@
             tramites: { label: 'Trámites', color: '#B2B9D7', bg: 'rgba(178, 185, 215, 0.23)', icon: '§' },
             descanso: { label: 'Descanso', color: '#A8A0DF', bg: 'rgba(168, 160, 223, 0.23)', icon: '☾' }
         };
-        const DEFAULT_CATEGORIES = JSON.parse(JSON.stringify(CATEGORIES));
+        const DEFAULT_CATEGORIES = Object.fromEntries(['trabajo','personal','creativo','estudio','salud','ejercicio'].map(key=>[key,LEGACY_CATEGORY_META[key]]));
+        let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
         const CATEGORY_SYMBOLS = ['✒','❧','✧','✦','◇','◈','⌘','⚜','☼','☾','♧','※','∞','⊹'];
+        const CATEGORY_COLORS = ['#6BA2DC','#6CC2A4','#E3B962','#83A9E8','#D88BAA','#8EC78C','#E4A77D','#C89BDE','#C6B77D','#78C5C0','#B2B9D7','#A8A0DF','#D58F67','#7FC6D0'];
 
         // Configuración geométrica del diagrama SVG del círculo cromático para cada tema
         const COLOR_THEORY_META = {
@@ -756,6 +808,7 @@
                 ]
             }
         };
+        const THEME_OPTIONS=[{key:'complementarios',name:'Medianoche'},{key:'triada',name:'Tríada'},{key:'analogos',name:'Botánico'}];
 
         // Generación exacta de horarios desde 06:30 hasta 23:00 en intervalos de 30 minutos
         const TIME_SLOTS = [];
@@ -768,6 +821,7 @@
         }
 
         const STORAGE_KEY = 'art_nouveau_nocturnal_almanac_v1';
+        const UI_STATE_KEY = 'art_nouveau_nocturnal_ui_v1';
         const SUPABASE_URL = 'https://aotrokqufdymfwkqdlmc.supabase.co';
         const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_V0cPlpDFML4n0go3qjKMwQ_Ssvjs3fP';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
@@ -788,10 +842,17 @@
         let choiceDialogOpener = null;
         let choiceDialogFocusId = null;
         let nowLineInterval = null;
+        let openWeekDrawer = null;
+        let agendaLayoutMode = window.innerWidth < 768 ? 'mobile' : 'desktop';
+        let agendaLayoutResizeTimer = null;
+        let dayBeforeWeekView = (new Date().getDay()+6)%7;
+        let uiSaveTimer = null;
+        let restoringUIState = false;
 
         let appState = {
             theme: 'complementarios',
-            weeks: {}
+            weeks: {},
+            categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
         };
 
         /* =====================================================================
@@ -822,8 +883,7 @@
         function formatDayDate(mondayISO, dayIdx) {
             const d = parseLocalISO(mondayISO);
             d.setDate(d.getDate() + dayIdx);
-            const months = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
-            return `${d.getDate()} DE ${months[d.getMonth()]}`;
+            return `${d.getDate()}/${d.getMonth()+1}`;
         }
 
         function createDefaultWeekData() {
@@ -843,6 +903,21 @@
 
         function createEmptyPlannerState(){return {theme:'complementarios',weeks:{},categories:JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),migrations:{}};}
         function resetCategoriesToDefaults(){Object.keys(CATEGORIES).forEach(key=>delete CATEGORIES[key]);Object.assign(CATEGORIES,JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)));}
+        function migrateCategories(state){
+            const hasSavedList=state.categories&&typeof state.categories==='object'&&!Array.isArray(state.categories)&&Object.keys(state.categories).length>0;const saved=hasSavedList?state.categories:{};const used=new Set();const migrated=state.migrations?.dynamicCategoriesV1===true&&hasSavedList;
+            Object.values(state.weeks||{}).forEach(week=>(week.tasks||[]).forEach(day=>(day||[]).forEach(task=>{if(task.category)used.add(task.category);})))
+            let next;
+            if(migrated){
+                next=Object.fromEntries(Object.entries(saved).filter(([,meta])=>meta&&typeof meta==='object').map(([key,meta])=>[key,{...(DEFAULT_CATEGORIES[key]||LEGACY_CATEGORY_META[key]||{}),...meta}]));
+            }else{
+                next=JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+                Object.keys(DEFAULT_CATEGORIES).forEach(key=>{if(saved[key]&&typeof saved[key]==='object')next[key]={...next[key],...saved[key]};});
+                [...used].forEach(key=>{if(next[key])return;const meta=saved[key]||LEGACY_CATEGORY_META[key];if(meta)next[key]={label:meta.label||key,color:meta.color||'#B2B9D7',bg:meta.bg||'rgba(178,185,215,.22)',icon:meta.icon||'✧'};});
+            }
+            if(!Object.keys(next).length)next=JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+            state.categories=next;state.migrations=state.migrations||{};state.migrations.dynamicCategoriesV1=true;Object.keys(CATEGORIES).forEach(key=>delete CATEGORIES[key]);Object.assign(CATEGORIES,next);
+            Object.values(state.weeks||{}).forEach(week=>(week.tasks||[]).forEach(day=>(day||[]).forEach(task=>{if(!CATEGORIES[task.category])task.category=Object.keys(CATEGORIES)[0]||'trabajo';})));
+        }
         function readLocalPlannerState(userId){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return null;const saved=JSON.parse(raw);if(saved?.user_id!==userId||!saved.data||typeof saved.data!=='object'||Array.isArray(saved.data)||!saved.data.weeks||typeof saved.data.weeks!=='object'||Array.isArray(saved.data.weeks)){localStorage.removeItem(STORAGE_KEY);return null;}return saved.data;}catch(error){console.warn('Se descartaron datos locales no válidos:',error);localStorage.removeItem(STORAGE_KEY);return null;}}
         function writeLocalPlannerState(){if(!currentUser?.id)return;localStorage.setItem(STORAGE_KEY,JSON.stringify({user_id:currentUser.id,data:appState}));}
         function resolvePlannerState(localState,cloudRow){const cloudState=cloudRow?.data&&typeof cloudRow.data==='object'&&!Array.isArray(cloudRow.data)?cloudRow.data:null;if(!cloudState)return localState||createEmptyPlannerState();const localTimestamp=Date.parse(localState?.updatedAt||'')||0;const cloudTimestamp=Date.parse(cloudRow.updated_at||cloudState.updatedAt||'')||0;if(localState&&localTimestamp>cloudTimestamp)return localState;if(!cloudState.updatedAt&&cloudRow.updated_at)cloudState.updatedAt=cloudRow.updated_at;return cloudState;}
@@ -853,12 +928,7 @@
             resetCategoriesToDefaults();
 
             if (!appState.weeks || typeof appState.weeks !== 'object') appState.weeks = {};
-            if (appState.categories && typeof appState.categories === 'object') {
-                Object.keys(DEFAULT_CATEGORIES).forEach(key => {
-                    const savedCat = appState.categories[key] || {};
-                    CATEGORIES[key] = { ...DEFAULT_CATEGORIES[key], ...savedCat };
-                });
-            } else { appState.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)); }
+            if (appState.categories && typeof appState.categories === 'object') Object.assign(CATEGORIES,appState.categories);
             const mondayKey = getMondayISO(weekOffset);
             if (!appState.weeks[mondayKey]) appState.weeks[mondayKey] = createDefaultWeekData();
 
@@ -872,14 +942,14 @@
             });
 
             // Migración no destructiva de campos nuevos y categorías ampliadas.
-            Object.keys(DEFAULT_CATEGORIES).forEach(key => { CATEGORIES[key] = { ...DEFAULT_CATEGORIES[key], ...(CATEGORIES[key] || {}) }; });
-            appState.categories = JSON.parse(JSON.stringify(CATEGORIES));
             Object.values(appState.weeks).forEach(w => {
                 if (!Array.isArray(w.priorities)) w.priorities = [];
                 w.priorities = Array.from({length:3}, (_,i) => { const item=w.priorities[i] || {text:'',done:false}; const status=item.status || (item.done ? 'done' : 'pending'); return {...item,status,done:status==='done'}; });
                 if (!Array.isArray(w.tasks)) w.tasks = Array.from({length:7},()=>[]);
                 w.tasks = Array.from({length:7},(_,i)=>(w.tasks[i]||[]).map(t=>({...t,endHour:t.endHour || nextTimeSlot(t.hour || '09:00'),status:t.status || (t.done?'done':'pending'),done:(t.status || (t.done?'done':'pending'))==='done'})));
             });
+            migrateCategories(appState);
+            writeLocalPlannerState();
 
             if (!COLOR_THEORY_META[appState.theme]) {
                 appState.theme = 'complementarios';
@@ -887,7 +957,7 @@
 
             setColorTheme(appState.theme, false);
             renderAll();
-            requestAnimationFrame(() => scrollDailyTimeline(focusedDayIndex));
+            requestAnimationFrame(() => { if(!restoringUIState)scrollDailyTimeline(focusedDayIndex); });
         }
 
         function setSyncStatus(state){const el=document.getElementById('syncStatus');if(!el)return;const labels={ok:'Sincronizado',busy:'Sincronizando…',error:'Sin conexión / error'};el.dataset.state=state;el.textContent=labels[state]||'';}
@@ -921,10 +991,11 @@
         function setColorTheme(themeKey, notify = true) {
             if (!COLOR_THEORY_META[themeKey]) return;
             appState.theme = themeKey; document.body.setAttribute('data-theme', themeKey);
-            const themeNames = { complementarios:'Medianoche', triada:'Tríada', analogos:'Botánico' };
-            Object.keys(COLOR_THEORY_META).forEach(key => { const btn=document.getElementById(`btn-theme-${key}`); if(!btn)return; const active=key===themeKey; btn.classList.toggle('is-active',active); btn.setAttribute('aria-pressed',String(active)); });
+            const themeNames = Object.fromEntries(THEME_OPTIONS.map(theme=>[theme.key,theme.name]));
+            renderThemes();
             saveState(false); if(notify) triggerToast(`Tema aplicado: ${themeNames[themeKey]}`);
         }
+        function renderThemes(){const box=document.getElementById('themeOptions');if(!box)return;box.innerHTML='';THEME_OPTIONS.forEach(theme=>{const active=theme.key===appState.theme;const btn=document.createElement('button');btn.type='button';btn.id=`btn-theme-${theme.key}`;btn.className=`nouveau-btn theme-option ${active?'is-active':''}`;btn.title=theme.name;btn.setAttribute('aria-label',`Tema ${theme.name}`);btn.setAttribute('aria-pressed',String(active));btn.innerHTML=`<span class="theme-check">✓</span><span class="theme-name">${theme.name}</span><span class="theme-swatches" data-theme="${theme.key}"><i style="background:var(--primary)"></i><i style="background:var(--secondary)"></i><i style="background:var(--accent-gold)"></i></span>`;btn.onclick=()=>setColorTheme(theme.key);box.appendChild(btn);});}
 
         function changeWeek(delta) {
             weekOffset = delta === 0 ? 0 : weekOffset + delta;
@@ -933,6 +1004,7 @@
             animateFocusedDay = focusedDayIndex !== null;
             renderAll();
             if (focusedDayIndex !== null) requestAnimationFrame(() => scrollDailyTimeline(focusedDayIndex));
+            scheduleUIStateSave();
             triggerToast(delta === 0 ? 'Semana actual' : 'Semana actualizada');
         }
 
@@ -953,7 +1025,15 @@
             renderPersonalTasks(weekData);
             updateGlobalProgress(weekData);
             updateNowLine();
+            if(!restoringUIState)scheduleUIStateSave();
         }
+
+        function shortWeekdayDate(mondayISO,idx){return `${DAYS_CONFIG[idx].name} ${formatDayDate(mondayISO,idx)}`;}
+        function readUIState(userId=currentUser?.id){try{const saved=JSON.parse(localStorage.getItem(UI_STATE_KEY)||'null');const age=Date.now()-Number(saved?.savedAt);if(!saved||saved.user_id!==userId||!Number.isFinite(age)||age<0||age>=6*60*60*1000||!saved.state||typeof saved.state!=='object')return null;return saved.state;}catch{return null;}}
+        function collectUIState(){return {weekOffset,focusedDayIndex,dayBeforeWeekView,openWeekDrawer,activeNotesTasksTab,pageScroll:window.scrollY,timelineScroll:document.querySelector(`#day-col-${focusedDayIndex} .timeline-scroll`)?.scrollTop||0,view:focusedDayIndex===null?'week':'day'};}
+        function saveUIState(){if(!currentUser?.id||restoringUIState)return;clearTimeout(uiSaveTimer);try{localStorage.setItem(UI_STATE_KEY,JSON.stringify({user_id:currentUser.id,savedAt:Date.now(),state:collectUIState()}));}catch{}}
+        function scheduleUIStateSave(){if(!currentUser?.id||restoringUIState)return;clearTimeout(uiSaveTimer);uiSaveTimer=setTimeout(saveUIState,350);}
+        function restoreUIState(userId){const saved=readUIState(userId);if(!saved)return false;weekOffset=Number.isInteger(saved.weekOffset)?saved.weekOffset:0;focusedDayIndex=saved.view==='week'?null:(Number.isInteger(saved.focusedDayIndex)?saved.focusedDayIndex:(new Date().getDay()+6)%7);dayBeforeWeekView=Number.isInteger(saved.dayBeforeWeekView)?saved.dayBeforeWeekView:(new Date().getDay()+6)%7;openWeekDrawer=Number.isInteger(saved.openWeekDrawer)?saved.openWeekDrawer:null;activeNotesTasksTab=saved.activeNotesTasksTab==='tasks'?'tasks':'notes';restoringUIState=true;renderAll();switchNotesTasksTab(activeNotesTasksTab);requestAnimationFrame(()=>requestAnimationFrame(()=>{window.scrollTo({top:Number(saved.pageScroll)||0,behavior:'instant'});const timeline=document.querySelector(`#day-col-${focusedDayIndex} .timeline-scroll`);if(timeline)timeline.scrollTop=Number(saved.timelineScroll)||0;restoringUIState=false;}));return true;}
 
         function getFocusedDayDate(dayIdx=focusedDayIndex){const date=parseLocalISO(getMondayISO(weekOffset));date.setDate(date.getDate()+dayIdx);return date;}
         function getTimeOffsetMinutes(date){return (date.getHours()*60+date.getMinutes())-(6*60+30);}
@@ -969,9 +1049,9 @@
                 const status=prio.status || (prio.done?'done':'pending'); prio.status=status; prio.done=status==='done';
                 const card=document.createElement('div'); card.style.backgroundColor='var(--card-elevated)'; card.style.borderColor='var(--border-ornament)'; card.className='p-3 rounded-xl border flex items-center gap-2.5';
                 card.innerHTML=`<div style="background-color:${idx===1?'var(--secondary)':'var(--primary)'};color:var(--ink-dark);border-color:var(--accent-gold);" class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-nouveau font-bold text-xs flex-shrink-0">${numerals[idx]}</div>
-                <div class="priority-status-group"><button type="button" aria-label="Prioridad lograda" aria-pressed="${status==='done'}" onclick="togglePriorityStatus(${idx},'done',this)" class="priority-status-btn ${status==='done'?'is-done':''}">✓</button><button type="button" aria-label="Prioridad no lograda" aria-pressed="${status==='missed'}" onclick="togglePriorityStatus(${idx},'missed',this)" class="priority-status-btn ${status==='missed'?'is-missed':''}">✗</button></div>
                 <div id="priority-viewport-${idx}" class="flex-1 min-w-0 priority-scroll-viewport"><input id="priority-input-${idx}" type="text" value="${escapeHtml(prio.text)}" placeholder="Escribe prioridad ${numerals[idx]}" oninput="evaluatePriorityOverflow(${idx},this);updatePriorityText(${idx},this.value,false)" onchange="updatePriorityText(${idx},this.value,true)" style="color:var(--ink-dark);" class="bg-transparent text-xs sm:text-sm font-semibold whitespace-nowrap focus:outline-none px-1.5 py-0.5 rounded w-full ${status==='done'?'line-through opacity-55':status==='missed'?'opacity-55':''}" /></div>
-                <button id="priority-scroll-btn-${idx}" type="button" onclick="nudgePriorityScroll(${idx})" title="Deslizar texto" style="background:var(--card-bg);border-color:var(--border-ornament);color:var(--accent-gold);" class="hidden px-2 py-1 rounded-md border text-xs font-bold flex-shrink-0">→</button>`;
+                <button id="priority-scroll-btn-${idx}" type="button" onclick="nudgePriorityScroll(${idx})" title="Deslizar texto" aria-label="Ver texto completo" style="color:var(--accent-gold);" class="hidden px-1 py-1 text-xs font-bold flex-shrink-0">→</button>
+                <div class="priority-status-group"><button type="button" aria-label="Prioridad lograda" aria-pressed="${status==='done'}" onclick="togglePriorityStatus(${idx},'done',this)" class="priority-status-btn ${status==='done'?'is-done':''}">✓</button><button type="button" aria-label="Prioridad no lograda" aria-pressed="${status==='missed'}" onclick="togglePriorityStatus(${idx},'missed',this)" class="priority-status-btn ${status==='missed'?'is-missed':''}">✗</button></div>`;
                 container.appendChild(card);
             });
             requestAnimationFrame(()=>weekData.priorities.forEach((_,idx)=>{const el=document.getElementById(`priority-input-${idx}`);if(el)evaluatePriorityOverflow(idx,el);}));
@@ -1062,7 +1142,7 @@
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 const isMobileLayout = window.matchMedia('(max-width: 767px)').matches;
-                btn.innerHTML = isMobileLayout ? `<span class="day-filter-name">${d.name}</span><span class="day-filter-date">${formatDayDate(mondayISO, idx)}</span>` : d.short;
+                btn.innerHTML = isMobileLayout ? `<span class="day-filter-name">${d.name}</span><span class="day-filter-date">${formatDayDate(mondayISO, idx)}</span>` : shortWeekdayDate(mondayISO,idx);
                 btn.onclick = () => setFocusedDay(focusedDayIndex === idx ? null : idx);
                 const isActive = focusedDayIndex === idx;
                 btn.style.background = isActive ? 'linear-gradient(135deg,var(--secondary),var(--primary))' : 'var(--card-elevated)';
@@ -1073,9 +1153,12 @@
             });
             const weekToggle = document.querySelector('.mobile-week-toggle');
             if (weekToggle) weekToggle.style.display = window.matchMedia('(max-width: 767px)').matches && focusedDayIndex !== null ? 'block' : 'none';
+            const returnBtn=document.getElementById('returnToDayButton');if(returnBtn)returnBtn.classList.toggle('hidden',focusedDayIndex!==null);
         }
 
         function setFocusedDay(idx) {
+            if(idx===null&&focusedDayIndex!==null)dayBeforeWeekView=focusedDayIndex;
+            if(idx!==null)dayBeforeWeekView=idx;
             focusedDayIndex = idx;
             animateFocusedDay = idx !== null;
             renderAll();
@@ -1084,6 +1167,7 @@
                 const container = document.getElementById('weekDaysContainer');
                 if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
             }
+            scheduleUIStateSave();
         }
 
         function scrollToDayColumn(dayIdx) {
@@ -1121,19 +1205,19 @@
         function setRepeatMode(mode){document.getElementById('repeatMode').value=mode;document.getElementById('repeatOnceBtn').classList.toggle('is-active',mode==='once');document.getElementById('repeatDaysBtn').classList.toggle('is-active',mode==='repeat');document.getElementById('repeatDaysPanel').classList.toggle('hidden',mode!=='repeat');updateRepeatPreview();}
         function getRepeatDays(){return [...document.querySelectorAll('#repeatDayChips button.is-active')].map(b=>Number(b.dataset.day));}
         function setRepeatPreset(which){const days=which==='all'?[0,1,2,3,4,5,6]:which==='weekdays'?[0,1,2,3,4]:[5,6];document.querySelectorAll('#repeatDayChips button').forEach(b=>b.classList.toggle('is-active',days.includes(Number(b.dataset.day))));updateRepeatPreview();}
-        function calculateRepeatDates(dayIdx,scope,chosenDays){const monday=parseLocalISO(getMondayISO(weekOffset));const selectedDate=new Date(monday);selectedDate.setDate(selectedDate.getDate()+dayIdx);const start=scope==='week'?new Date(monday):scope==='month'?new Date(selectedDate.getFullYear(),selectedDate.getMonth(),1):new Date(selectedDate);const end=scope==='week'?new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+6):new Date(selectedDate.getFullYear(),selectedDate.getMonth()+1,0);const dates=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){if((scope==='week'||d.getMonth()===selectedDate.getMonth())&&chosenDays.has((d.getDay()+6)%7))dates.push(new Date(d));}return dates;}
+        function calculateRepeatDates(dayIdx,scope,chosenDays){const monday=parseLocalISO(getMondayISO(weekOffset));const selectedDate=new Date(monday);selectedDate.setDate(selectedDate.getDate()+dayIdx);const start=scope==='week'?new Date(monday):new Date(selectedDate.getFullYear(),selectedDate.getMonth(),1);const end=scope==='week'?new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+6):new Date(selectedDate.getFullYear(),selectedDate.getMonth()+1,0);const dates=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){if((scope==='week'||d.getMonth()===selectedDate.getMonth())&&chosenDays.has((d.getDay()+6)%7))dates.push(new Date(d));}return dates;}
         function updateRepeatPreview(){const dayIdx=Number(document.getElementById('modalDayIndex').value);const mode=document.getElementById('repeatMode')?.value||'once';if(mode!=='repeat'){document.getElementById('repeatPreview').textContent='Se creará 1 actividad';return;}const dates=calculateRepeatDates(dayIdx,document.getElementById('repeatUntil').value,new Set(getRepeatDays()));document.getElementById('repeatPreview').textContent=`Se crearán ${dates.length} ${dates.length===1?'actividad':'actividades'}`;}
         function initializeRepeatChips(dayIdx){const box=document.getElementById('repeatDayChips');box.innerHTML='';DAYS_CONFIG.forEach((d,i)=>{const b=document.createElement('button');b.type='button';b.className='repeat-chip'+(i===dayIdx?' is-active':'');b.dataset.day=i;b.textContent=d.short;b.onclick=()=>{b.classList.toggle('is-active');updateRepeatPreview();};box.appendChild(b);});}
 
         function renderWeeklySchedule(mondayISO, weekData) {
-            const grid=document.getElementById('weekDaysGrid');grid.innerHTML='';grid.className=focusedDayIndex!==null?'flex flex-row justify-center w-full':'flex flex-row gap-4 w-max';
+            const grid=document.getElementById('weekDaysGrid');grid.innerHTML='';grid.className=focusedDayIndex!==null?'flex flex-row justify-center w-full':'is-compact';
+            if(focusedDayIndex===null){renderCompactWeek(mondayISO,weekData,grid);animateFocusedDay=false;return;}
             DAYS_CONFIG.forEach((dayMeta,dayIdx)=>{
-                if(focusedDayIndex!==null&&focusedDayIndex!==dayIdx)return;
+                if(focusedDayIndex!==dayIdx)return;
                 const dayTasks=(weekData.tasks[dayIdx]||[]).slice();const completedCount=dayTasks.filter(t=>t.status==='done'||t.done).length;const dayPct=dayTasks.length?Math.round(completedCount/dayTasks.length*100):0;
-                if(focusedDayIndex===null&&window.matchMedia('(max-width: 767px)').matches){const mini=document.createElement('article');mini.className='nouveau-frame day-mini-card overflow-hidden';mini.innerHTML=`<button type="button" onclick="setFocusedDay(${dayIdx})" class="w-full h-full p-3 text-left" style="background:${dayIdx%2===0?'var(--primary)':'var(--secondary)'};color:var(--ink-dark);border:1px solid var(--accent-gold);"><div class="font-nouveau font-bold text-sm tracking-wide">${dayMeta.name}</div><div class="text-[10px] opacity-80 mt-1">${formatDayDate(mondayISO,dayIdx)}</div><div class="flex items-center gap-2 mt-3"><div class="flex-1 h-1.5 rounded-full bg-black/30 overflow-hidden"><div class="h-full" style="width:${dayPct}%;background:var(--accent-gold)"></div></div><span class="text-[9px] font-bold">${completedCount}/${dayTasks.length}</span></div><div class="text-[9px] mt-2 font-bold" style="color:var(--accent-gold)">Abrir jornada ↗</div></button>`;grid.appendChild(mini);return;}
                 const card=document.createElement('article');card.id=`day-col-${dayIdx}`;const colWidthClass=focusedDayIndex!==null?'w-full max-w-none h-[calc(100vh-220px)] min-h-[520px]':'w-[78vw] sm:w-[310px] md:w-[295px] lg:w-[285px] h-[590px] flex-shrink-0';card.className=`nouveau-frame day-expanded-card flex flex-col overflow-hidden ${colWidthClass}`;if(focusedDayIndex!==null&&animateFocusedDay)card.classList.add('day-open-animation');
                 const headerBg=dayIdx%2===0?'var(--primary)':'var(--secondary)';
-                let html=`<div style="background:${headerBg};color:var(--ink-dark);border-color:var(--accent-gold)" class="p-3 border-b-2 flex-shrink-0"><h3 class="day-heading">${dayMeta.name.toUpperCase()}</h3><div class="day-date-line">${formatDayDate(mondayISO,dayIdx)}</div><button type="button" id="day-add-activity-${dayIdx}" onclick="openScheduleModal(${dayIdx},'09:00','',event.currentTarget)" style="background:linear-gradient(135deg,var(--bg-paper-deep),var(--card-elevated));color:var(--ink-dark);border:1px solid var(--accent-gold);" class="day-add-activity mt-3 w-full rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 text-xs font-extrabold"><span style="color:var(--accent-gold);font-size:18px">＋</span> Agendar actividad</button><div class="mt-3 flex items-center gap-2"><div class="flex-1 h-1.5 bg-black/35 rounded-full overflow-hidden"><div style="width:${dayPct}%;background:var(--accent-gold)" class="h-full"></div></div><span class="text-[10px] font-bold">${completedCount}/${dayTasks.length}</span></div></div>`;
+                let html=`<div style="background:${headerBg};color:var(--ink-dark);border-color:var(--accent-gold)" class="p-3 border-b-2 flex-shrink-0"><h3 class="day-heading">${dayMeta.name}</h3><div class="day-date-line">${formatDayDate(mondayISO,dayIdx)}</div><button type="button" id="day-add-activity-${dayIdx}" onclick="openScheduleModal(${dayIdx},'09:00','',event.currentTarget)" style="background:linear-gradient(135deg,var(--bg-paper-deep),var(--card-elevated));color:var(--ink-dark);border:1px solid var(--accent-gold);" class="day-add-activity mt-3 w-full rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 text-xs font-extrabold"><span style="color:var(--accent-gold);font-size:18px">＋</span> Agendar actividad</button><div class="mt-3 flex items-center gap-2"><div class="flex-1 h-1.5 bg-black/35 rounded-full overflow-hidden"><div style="width:${dayPct}%;background:var(--accent-gold)" class="h-full"></div></div><span class="text-[10px] font-bold">${completedCount}/${dayTasks.length}</span></div></div>`;
                 html+='<div class="flex-1 overflow-y-auto timeline-scroll"><div class="timeline-canvas">';
                 TIME_SLOTS.slice(0,-1).forEach((slot,i)=>{const top=i*80;html+=`<div class="timeline-slot" style="top:${top}px" onclick="openInlineEditor(${dayIdx},'${slot}')"><span class="slot-time">${slot}</span><span class="text-[9px] opacity-0 hover:opacity-70">＋</span></div>`;});html+=`<div class="timeline-slot" style="top:${(TIME_SLOTS.length-1)*80}px" onclick="openInlineEditor(${dayIdx},'23:00')"><span class="slot-time">23:00</span></div>`;
                 const sorted=dayTasks.sort((a,b)=>timeIndex(a.hour||'09:00')-timeIndex(b.hour||'09:00'));const layouts=[];let group=[];let groupEnd=-1;
@@ -1144,6 +1228,19 @@
                 html+='</div></div>';card.innerHTML=html;grid.appendChild(card);
             });animateFocusedDay=false;if(inlineEditorState){const inp=document.getElementById('inlineTaskInput');if(inp)inp.focus();}updateNowLine();
         }
+
+        function renderCompactWeek(mondayISO,weekData,grid){
+            const today=localDateISO(new Date());
+            DAYS_CONFIG.forEach((meta,idx)=>{
+                const date=parseLocalISO(mondayISO);date.setDate(date.getDate()+idx);const isToday=localDateISO(date)===today;const tasks=(weekData.tasks[idx]||[]).slice().sort((a,b)=>timeIndex(a.hour||'09:00')-timeIndex(b.hour||'09:00'));const done=tasks.filter(t=>t.status==='done'||t.done).length;const pct=tasks.length?Math.round(done/tasks.length*100):0;const isDesktop=window.matchMedia('(min-width: 768px)').matches;const opened=isDesktop||openWeekDrawer===idx;
+                const card=document.createElement('article');card.className=`nouveau-frame compact-week-card ${opened?'is-open':''} ${isToday?'is-today':''}`;
+                const rows=tasks.length?tasks.map(task=>{const cat=CATEGORIES[task.category]||CATEGORIES[Object.keys(CATEGORIES)[0]];const status=task.status==='done'||task.done?'done':task.status==='missed'?'missed':'pending';const symbol=status==='done'?'✓':status==='missed'?'✗':'·';return `<button type="button" class="compact-task-row" onclick="openScheduleModal(${idx},'${task.hour||'09:00'}','${task.id}',event.currentTarget)"><span class="compact-category-dot" style="background:${cat.color}"></span><span class="compact-task-time">${task.hour||'09:00'}–${getTaskEnd(task)}</span><span class="compact-task-title">${escapeHtml(task.text)}</span><span class="compact-task-status is-${status}" aria-label="${status==='done'?'Cumplida':status==='missed'?'No cumplida':'Pendiente'}">${symbol}</span></button>`;}).join(''):'<div class="compact-empty">Sin actividades</div>';
+                const headerAction=window.matchMedia('(min-width: 768px)').matches?`setFocusedDay(${idx})`:`toggleWeekDrawer(${idx})`;
+                card.innerHTML=`<button type="button" class="compact-week-head" onclick="${headerAction}" aria-expanded="${opened}"><span class="compact-day-name">${shortWeekdayDate(mondayISO,idx)}${isToday?'<span class="today-mark" aria-label="Hoy">✦</span>':''}</span><span class="compact-count">${tasks.length} ${tasks.length===1?'actividad':'actividades'}</span><span class="compact-progress"><i style="width:${pct}%"></i></span></button><div class="compact-week-content ${opened?'':'is-collapsed'}"><div class="compact-task-list">${rows}</div><div class="compact-week-actions"><button type="button" class="compact-add" onclick="openScheduleModal(${idx},'09:00','',event.currentTarget)">＋ Agendar actividad</button><button type="button" class="compact-open-day" onclick="setFocusedDay(${idx})">Abrir día completo</button></div></div>`;
+                grid.appendChild(card);
+            });
+        }
+        function toggleWeekDrawer(idx){openWeekDrawer=openWeekDrawer===idx?null:idx;renderAll();}
 
         function openInlineEditor(dayIdx, hour) {
             inlineEditorState = { dayIdx, hour };
@@ -1220,25 +1317,25 @@
                 edit.type = 'button';
                 edit.className = 'category-edit-btn mt-1';
                 edit.textContent = '✎ Editar';
-                edit.onclick = () => {
-                    const nextName = prompt('Nombre de la categoría:', meta.label);
-                    if (nextName === null) return;
-                    const cleanName = nextName.trim().slice(0, 22);
-                    if (!cleanName) { triggerToast('El nombre no puede quedar vacío'); return; }
-                    const nextSymbol = prompt('Elegí un símbolo ornamental (no emoji):\n' + CATEGORY_SYMBOLS.join('  '), meta.icon);
-                    if (nextSymbol === null) return;
-                    const cleanSymbol = nextSymbol.trim().slice(0, 3) || meta.icon;
-                    CATEGORIES[key] = { ...meta, label: cleanName, icon: cleanSymbol };
-                    appState.categories = JSON.parse(JSON.stringify(CATEGORIES));
-                    saveState(false);
-                    renderModalCategories(key);
-                    renderWeeklySchedule(getMondayISO(weekOffset), getActiveWeek());
-                };
+                edit.onclick = () => openCategoryEditor(key);
                 card.appendChild(choose);
                 card.appendChild(edit);
                 container.appendChild(card);
             });
+            const add=document.getElementById('addCategoryButton');if(add)add.disabled=Object.keys(CATEGORIES).length>=12;
         }
+
+        let editingCategoryKey=null,addingCategory=false,pendingCategoryRemoval=null,categoryDraftStyle=null;
+        function randomCategoryStyle(exceptKey=null){const usedColors=new Set(Object.entries(CATEGORIES).filter(([k])=>k!==exceptKey).map(([,v])=>v.color));const usedIcons=new Set(Object.entries(CATEGORIES).filter(([k])=>k!==exceptKey).map(([,v])=>v.icon));const colors=CATEGORY_COLORS.filter(color=>!usedColors.has(color));const icons=CATEGORY_SYMBOLS.filter(icon=>!usedIcons.has(icon));const color=(colors.length?colors:CATEGORY_COLORS)[Math.floor(Math.random()*(colors.length||CATEGORY_COLORS.length))];const icon=(icons.length?icons:CATEGORY_SYMBOLS)[Math.floor(Math.random()*(icons.length||CATEGORY_SYMBOLS.length))];return {color,bg:color+'38',icon};}
+        function addCategory(){if(Object.keys(CATEGORIES).length>=12){triggerToast('Ya hay 12 categorías');return;}const style=randomCategoryStyle();let key='nueva_categoria';let n=2;while(CATEGORIES[key])key=`nueva_categoria_${n++}`;CATEGORIES[key]={label:'Nueva categoría',...style};addingCategory=true;openCategoryEditor(key);}
+        function openCategoryEditor(key){editingCategoryKey=key;const meta=CATEGORIES[key];if(!meta)return;categoryDraftStyle={color:meta.color,bg:meta.bg};document.getElementById('categoryEditorColorPreview').style.background=meta.color;document.getElementById('categoryEditorTitle').textContent=addingCategory?'Nueva categoría':'Editar categoría';document.getElementById('categoryEditorName').value=meta.label;document.getElementById('categoryEditorIcon').value=meta.icon;document.getElementById('removeCategoryButton').classList.toggle('hidden',addingCategory);document.getElementById('categoryEditor').classList.remove('hidden');setTimeout(()=>document.getElementById('categoryEditorName').focus(),0);}
+        function closeCategoryEditor(){document.getElementById('categoryEditor').classList.add('hidden');if(addingCategory&&editingCategoryKey){delete CATEGORIES[editingCategoryKey];appState.categories=JSON.parse(JSON.stringify(CATEGORIES));}editingCategoryKey=null;addingCategory=false;categoryDraftStyle=null;renderModalCategories(document.getElementById('modalCategoryValue').value);}
+        function rerollCategory(){if(!editingCategoryKey)return;categoryDraftStyle=randomCategoryStyle(editingCategoryKey);document.getElementById('categoryEditorColorPreview').style.background=categoryDraftStyle.color;document.getElementById('categoryEditorIcon').value=categoryDraftStyle.icon;}
+        function saveCategoryEditor(){const key=editingCategoryKey;if(!key)return;const name=document.getElementById('categoryEditorName').value.trim().slice(0,22);const icon=document.getElementById('categoryEditorIcon').value.trim().slice(0,3);if(!name||!icon){triggerToast('Completá el nombre y el ícono');return;}CATEGORIES[key]={...CATEGORIES[key],...categoryDraftStyle,label:name,icon};addingCategory=false;appState.categories=JSON.parse(JSON.stringify(CATEGORIES));saveState(false);document.getElementById('categoryEditor').classList.add('hidden');editingCategoryKey=null;categoryDraftStyle=null;renderModalCategories(key);renderAll();}
+        async function removeCategory(){const key=editingCategoryKey;if(!key||Object.keys(CATEGORIES).length<=1){triggerToast('Tiene que quedar al menos una categoría');return;}let count=0;Object.values(appState.weeks||{}).forEach(w=>(w.tasks||[]).forEach(d=>(d||[]).forEach(t=>{if(t.category===key)count++;})));if(!count){const answer=await showChoiceDialog('¿Quitar categoría?','Esta categoría no tiene actividades.',[{label:'Quitar',value:'remove'},{label:'Cancelar',value:'cancel'}]);if(answer!=='remove')return;delete CATEGORIES[key];finishCategoryRemoval(key);return;}pendingCategoryRemoval={key,selected:document.getElementById('modalCategoryValue').value};document.getElementById('categoryMoveTitle').textContent='Quitar categoría';document.getElementById('categoryMoveText').textContent=`Esta categoría tiene ${count} ${count===1?'actividad':'actividades'}. ¿A cuál las pasás?`;const select=document.getElementById('categoryMoveTarget');select.innerHTML='';Object.entries(CATEGORIES).filter(([other])=>other!==key).forEach(([other,meta])=>{const option=document.createElement('option');option.value=other;option.textContent=`${meta.icon} ${meta.label}`;select.appendChild(option);});document.getElementById('categoryEditor').classList.add('hidden');document.getElementById('categoryMoveDialog').classList.remove('hidden');}
+        function closeCategoryMoveDialog(){document.getElementById('categoryMoveDialog').classList.add('hidden');pendingCategoryRemoval=null;if(editingCategoryKey)document.getElementById('categoryEditor').classList.remove('hidden');}
+        function confirmCategoryMove(){if(!pendingCategoryRemoval)return;const {key}=pendingCategoryRemoval;const target=document.getElementById('categoryMoveTarget').value;if(!target||!CATEGORIES[target])return;Object.values(appState.weeks||{}).forEach(w=>(w.tasks||[]).forEach(d=>(d||[]).forEach(t=>{if(t.category===key)t.category=target;})));delete CATEGORIES[key];closeCategoryMoveDialog();finishCategoryRemoval(key);}
+        function finishCategoryRemoval(oldKey){appState.categories=JSON.parse(JSON.stringify(CATEGORIES));saveState(false);closeCategoryEditor();const selected=document.getElementById('modalCategoryValue').value===oldKey?Object.keys(CATEGORIES)[0]:document.getElementById('modalCategoryValue').value;renderModalCategories(selected);renderAll();}
 
         async function submitScheduleModal(e){e.preventDefault();const dayIdx=Number(document.getElementById('modalDayIndex').value),taskId=document.getElementById('modalTaskId').value,hour=document.getElementById('modalHourSelect').value,endHour=document.getElementById('modalEndHourSelect').value,text=document.getElementById('modalTaskText').value.trim(),category=document.getElementById('modalCategoryValue').value;if(!text)return;if(timeIndex(endHour)<=timeIndex(hour)){triggerToast('La hora de fin debe ser posterior a la hora de inicio');return;}
             const week=getActiveWeek();if(taskId){const target=week.tasks[dayIdx].find(t=>t.id===taskId);if(!target)return;let apply='one';if(target.seriesId){apply=await showChoiceDialog('Editar actividad de la serie','¿Querés aplicar los cambios a esta actividad o a toda la serie?',[{label:'Solo esta',value:'one'},{label:'Toda la serie',value:'all'},{label:'Cancelar',value:'cancel'}]);if(apply==='cancel')return;}const patch=t=>{t.hour=hour;t.endHour=endHour;t.text=text;t.category=category;};if(apply==='all')getAllSeriesOccurrences(target.seriesId).forEach(o=>patch(o.task));else patch(target);
@@ -1336,6 +1433,7 @@
         function switchNotesTasksTab(tab) {
             activeNotesTasksTab=tab;const notes=tab==='notes';document.getElementById('notesPanel').classList.toggle('hidden',!notes);document.getElementById('tasksPanel').classList.toggle('hidden',notes);
             document.getElementById('notesTabBtn').classList.toggle('is-active',notes);document.getElementById('tasksTabBtn').classList.toggle('is-active',!notes);document.getElementById('notesTabBtn').setAttribute('aria-pressed',String(notes));document.getElementById('tasksTabBtn').setAttribute('aria-pressed',String(!notes));
+            scheduleUIStateSave();
         }
 
         function renderPersonalTasks(weekData) {
@@ -1509,6 +1607,9 @@
         function validateBackupState(value){if(!value||typeof value!=='object'||Array.isArray(value)||!value.weeks||typeof value.weeks!=='object'||Array.isArray(value.weeks))return false;return Object.values(value.weeks).every(week=>{if(!week||typeof week!=='object'||Array.isArray(week))return false;if(week.tasks!==undefined&&(!Array.isArray(week.tasks)||week.tasks.some(day=>day!==undefined&&!Array.isArray(day))))return false;return true;});}
         async function importBackupFile(event){const input=event.currentTarget;const file=input.files?.[0];input.value='';if(!file)return;try{const backup=JSON.parse((await file.text()).replace(/^\uFEFF/,''));if(!validateBackupState(backup)){triggerToast('El archivo no tiene una estructura de respaldo válida');return;}const choice=await showChoiceDialog('¿Importar este respaldo?','Esto reemplazará todos los datos actuales y sincronizará el respaldo con Supabase.',[{label:'Cancelar',value:'cancel'},{label:'Reemplazar datos',value:'replace'}]);if(choice!=='replace')return;appState=backup;writeLocalPlannerState();initializePlanner();clearTimeout(cloudSaveTimer);const synced=await saveToCloud();triggerToast(synced?'Respaldo importado y sincronizado':'Respaldo importado localmente; falta sincronizar');}catch(error){console.error('Error importando respaldo:',error);triggerToast('No se pudo importar el respaldo');}}
 
+        function scrollPageToTop(){window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+        function updateBackToTop(){document.getElementById('backToTopButton')?.classList.toggle('is-visible',window.scrollY>400);}
+
         async function saveToCloud() {
             if (!cloudReady || !currentUser) return;
             if (navigator.onLine === false) { setSyncStatus('error'); return false; }
@@ -1547,7 +1648,9 @@
             cloudReady = true;
             document.getElementById('accountEmail').textContent=`Sesión iniciada: ${user.email||'cuenta conectada'}`;
             document.getElementById('authGate').classList.add('hidden');
+            const savedUI=readUIState(user.id);if(savedUI){weekOffset=Number.isInteger(savedUI.weekOffset)?savedUI.weekOffset:0;focusedDayIndex=savedUI.view==='week'?null:(Number.isInteger(savedUI.focusedDayIndex)?savedUI.focusedDayIndex:(new Date().getDay()+6)%7);dayBeforeWeekView=Number.isInteger(savedUI.dayBeforeWeekView)?savedUI.dayBeforeWeekView:(new Date().getDay()+6)%7;openWeekDrawer=Number.isInteger(savedUI.openWeekDrawer)?savedUI.openWeekDrawer:null;activeNotesTasksTab=savedUI.activeNotesTasksTab==='tasks'?'tasks':'notes';restoringUIState=true;}
             initializePlanner();
+            if(savedUI)restoreUIState(user.id);else{weekOffset=0;focusedDayIndex=(new Date().getDay()+6)%7;activeNotesTasksTab='notes';switchNotesTasksTab('notes');}
             clearTimeout(cloudSaveTimer);
             await saveToCloud();
         }
@@ -1571,9 +1674,9 @@
             }
             try{const {error}=await supabaseClient.auth.signOut();if(error)throw error;}
             catch(error){console.error('Error cerrando sesión:',error);triggerToast('No se pudo cerrar sesión. Revisá tu conexión e intentá de nuevo.');if(button)button.disabled=false;return;}
-            try{localStorage.removeItem(STORAGE_KEY);}catch(error){console.warn('No se pudo borrar el respaldo local:',error);}
+            try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(UI_STATE_KEY);}catch(error){console.warn('No se pudo borrar el respaldo local:',error);}
             cloudSaveTimer=null;cloudReady=false;currentUser=null;lastCloudSyncedAt=null;
-            appState=createEmptyPlannerState();resetCategoriesToDefaults();weekOffset=0;focusedDayIndex=(new Date().getDay()+6)%7;inlineEditorState=null;lastShimmeryTaskId=null;activeNotesTasksTab='notes';animateFocusedDay=false;
+            appState=createEmptyPlannerState();resetCategoriesToDefaults();weekOffset=0;focusedDayIndex=(new Date().getDay()+6)%7;dayBeforeWeekView=focusedDayIndex;openWeekDrawer=null;restoringUIState=false;inlineEditorState=null;lastShimmeryTaskId=null;activeNotesTasksTab='notes';animateFocusedDay=false;
             setColorTheme('complementarios',false);switchNotesTasksTab('notes');
             document.getElementById('accountEmail').textContent='';document.getElementById('syncStatus').textContent='';document.getElementById('syncStatus').removeAttribute('data-state');
             document.getElementById('loginForm').reset();document.getElementById('loginError').textContent='';document.getElementById('loginButton').textContent='Entrar al almanaque';document.getElementById('loginButton').disabled=false;
@@ -1624,7 +1727,15 @@
         document.addEventListener('keydown',handleDialogEscape);
         window.addEventListener('online',()=>{if(cloudReady&&currentUser)saveToCloud();});
         window.addEventListener('offline',()=>{if(cloudReady&&currentUser)setSyncStatus('error');});
-        window.addEventListener('DOMContentLoaded',()=>{if(nowLineInterval)clearInterval(nowLineInterval);nowLineInterval=setInterval(updateNowLine,60000);});
+        window.addEventListener('DOMContentLoaded',()=>{if(nowLineInterval)clearInterval(nowLineInterval);nowLineInterval=setInterval(updateNowLine,60000);renderThemes();updateBackToTop();});
+        window.addEventListener('scroll',updateBackToTop,{passive:true});
+        document.addEventListener('scroll',event=>{if(event.target?.classList?.contains('timeline-scroll'))scheduleUIStateSave();},true);
+        window.addEventListener('scroll',scheduleUIStateSave,{passive:true});
+        window.addEventListener('resize',scheduleUIStateSave);
+        window.addEventListener('resize',()=>{clearTimeout(agendaLayoutResizeTimer);agendaLayoutResizeTimer=setTimeout(()=>{const nextMode=window.innerWidth<768?'mobile':'desktop';if(nextMode===agendaLayoutMode)return;agendaLayoutMode=nextMode;if(focusedDayIndex===null)renderAll();else renderQuickDayFilters();scheduleUIStateSave();},140);});
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveUIState();});
+        window.addEventListener('pagehide',saveUIState);
+        window.addEventListener('pageshow',event=>{if(event.persisted)updateBackToTop();});
         window.addEventListener('resize', () => {
             const weekData = getActiveWeek();
             if (!weekData || !weekData.priorities) return;
